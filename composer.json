@@ -1,0 +1,21 @@
+{
+  "name": "bakl/dbeasy",
+  "description": "Interface to work with database",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Sergey Martyanov",
+      "email": "s-m-box@yandex.ru"
+    }
+  ],
+  "require-dev" : {
+    "phpunit/phpunit": "3.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "DbEasy\\Tests\\": "tests/",
+      "DbEasy\\": "src/classes/"
+    }
+  }
+}
