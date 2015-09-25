@@ -10,32 +10,36 @@ namespace DbEasy\Engine;
 
 class AbstractEngine
 {
+    protected $identPrefix = "";
+
+    public function setIdentPrefix($prefix){
+        $this->identPrefix = $prefix;
+    }
+
     protected function expandPlaceHolders($query, $params, $expandNative = false){
         $params = array_reverse($params);
         $unusedParams = array();
 
         $query = preg_replace_callback(
-            "/\?#|\?f|\?d|\?a|\?/",
-            function($matches) use (&$params, &$unusedParams){
-                $placeHolder = $matches[0];
+            "/(\?(?:#|f|d|a|_)*)+([^\{\}\/,\.\s\(\)]+)*/",
+            function($matches) use (&$params, &$unusedParams, $expandNative){
+                $placeHolder = $matches[1];
+                $placeHolderParam = (isset($matches[2])) ? $matches[2] : "";
                 switch($placeHolder){
                     case "?#":
                         return $this->escapeIdentifier(array_pop($params));
                         break;
                     case "?f":
-                        $floatParam = array_pop($params);
-                        if(!is_float($floatParam))
-                            throw new \Exception("Not float value passed for ?f placeholder " . $floatParam);
+                        $floatParam = floatval(array_pop($params));
                         return $this->escapeParam($floatParam);
                         break;
                     case "?d":
-                        $intParam = array_pop($params);
-                        if(!is_int($intParam))
-                            throw new \Exception("Not int value passed for ?d placeholder" . $intParam);
+                        $intParam = intval(array_pop($params));
                         return $this->escapeParam($intParam);
                         break;
                     case "?a":
                         $arrayParams = array_pop($params);
+                        if($arrayParams == DBSIMPLE_SKIP) return DBSIMPLE_SKIP;
                         array_walk($arrayParams, function(&$item, &$key){
                             $item = $this->escapeParam($item);
                             if(!is_int($key)) {
@@ -46,12 +50,40 @@ class AbstractEngine
                         return implode(',', $arrayParams);
                         break;
                     case "?":
-                        array_push($unusedParams, array_pop($params));
-                        return $placeHolder;
+                        if($expandNative){
+                            return $this->escapeParam(array_pop($params));
+                        } else {
+                            array_push($unusedParams, array_pop($params));
+                            return $placeHolder;
+                        }
                         break;
+                    case "?_":
+                        return $this->escapeIdentifier($this->identPrefix.$placeHolderParam);
                     default:
                         return $placeHolder;
                 }
+            },
+            $query
+        );
+
+        $query = preg_replace_callback(
+            "/\{(\s|.*?)\}/si",
+            function($matches)  use (&$unusedParams) {
+//                var_dump($matches);
+                if(preg_match("/".DBSIMPLE_SKIP."/", $matches[1]))
+                    return "";
+                if(preg_match_all("/\?/", $matches[1], $matchesPlaceholders)) {
+                    $found = false;
+                    for ($i = 0; $i < count($matchesPlaceholders[0]); $i++) {
+                        if ($unusedParams[$i] == DBSIMPLE_SKIP || $found) {
+                            unset($unusedParams[$i]);
+                            $found = true;
+                        }
+                    }
+                    $unusedParams = array_values($unusedParams);
+                    if ($found) return "";
+                }
+                return $matches[1];
             },
             $query
         );

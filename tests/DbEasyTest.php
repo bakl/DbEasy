@@ -13,7 +13,7 @@ class DbEasyTest extends PHPUnit_Framework_TestCase
     private $db;
 
     public function setUp(){
-        $this->db = new DbEasy("mysql://root:CeRf@localhost/exercise");
+        $this->db = new DbEasy("mysql://root:CeRf@127.0.0.1/exercise");
     }
 
     public function testSimpleQuery()
@@ -58,11 +58,27 @@ class DbEasyTest extends PHPUnit_Framework_TestCase
 
     public function testQueryAssociativePlaceHolder()
     {
-        $this->db->query("UPDATE human SET ?a WHERE id = ", array('id' => 9999), 3);
-        $this->db->query("UPDATE human SET ?a WHERE id = ", array('id' => 3), 3);
+        $this->db->query("UPDATE human SET ?a WHERE id = ?", array('name' => 'George_wrong_name'), 3);
+        $this->db->query("UPDATE human SET ?a WHERE id = ?", array('name' => 'George'), 3);
 
         $result = $this->db->selectCol("SELECT name FROM human WHERE id = ?d", 3);
 //        var_dump($result);
+        $this->assertEquals(array('George'), $result);
+    }
+
+    public function testOptionalBlocks()
+    {
+
+        $result = $this->db->selectCol(
+            "SELECT name
+            FROM human
+            WHERE id = ?d {AND id != ? OR id != ?} {AND id != ?}",
+            3,
+            DBSIMPLE_SKIP,
+            4,
+            5
+        );
+        var_dump($result);
         $this->assertEquals(array('George'), $result);
     }
 }

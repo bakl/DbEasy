@@ -11,4 +11,10 @@ interface EngineInterface
     public function connect($dsn);
 
     public function query($query, $params);
+
+    public function setIdentPrefix($prefix);
+
+    public function getQuery($query, $params);
+
+    public function initialized();
 }
