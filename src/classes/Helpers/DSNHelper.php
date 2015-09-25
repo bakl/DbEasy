@@ -9,7 +9,7 @@ namespace DbEasy\Helpers;
  */
 class DSNHelper
 {
-    public function parse($dsn)
+    public static function parse($dsn)
     {
         $parsed = parse_url($dsn);
         if (!$parsed) return null;
@@ -22,7 +22,7 @@ class DSNHelper
         return $parsed;
     }
 
-    public function parseScheme($dsn)
+    public static function parseScheme($dsn)
     {
         $parsed = parse_url($dsn, PHP_URL_SCHEME);
         return ($parsed) ? $parsed : null;

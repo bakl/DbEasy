@@ -66,19 +66,32 @@ class DbEasyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('George'), $result);
     }
 
-    public function testOptionalBlocks()
+    public function testQueryWithOptionalBlocks()
     {
 
         $result = $this->db->selectCol(
             "SELECT name
             FROM human
-            WHERE id = ?d {AND id != ? OR id != ?} {AND id != ?}",
-            3,
-            DBSIMPLE_SKIP,
-            4,
-            5
+            WHERE
+             id = ?d
+             {AND id != ? OR id != ?}
+             {AND id != ?}", 3, \DbEasy\DBEASY_SKIP, 4, 5
         );
-        var_dump($result);
         $this->assertEquals(array('George'), $result);
     }
+
+    public function testInsertQuery(){
+        $this->db->query("DELETE FROM human WHERE name = 'TestHuman'");
+
+        $id = $this->db->query("INSERT INTO human (`name`, `age`) VALUES(?,?)", 'TestHuman', 25);
+        $this->assertNotEmpty($id);
+
+        $insertedHuman = $this->db->selectCell("SELECT name FROM human WHERE id = ?", $id);
+        $this->assertEquals($insertedHuman, 'TestHuman');
+
+        $deletedCount = $this->db->query("DELETE FROM human WHERE id = ?", $id);
+        $this->assertEquals(1, $deletedCount);
+    }
+
+
 }

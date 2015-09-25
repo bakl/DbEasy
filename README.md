@@ -19,6 +19,8 @@ with inteface DbSimple
 <br/> 14. Linked tree fetching 
 <br/> 15. prepare ... execute optimization [-]
  
- 
+transatctions
+disconnect
+cache
  
  

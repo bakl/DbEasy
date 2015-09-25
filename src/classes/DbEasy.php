@@ -10,8 +10,9 @@ namespace DbEasy;
 use DbEasy\Engine\EngineInterface;
 use DbEasy\Helpers\DSNHelper;
 
-if (!defined('DBSIMPLE_SKIP'))
-    define('DBSIMPLE_SKIP', log(0));
+//Define skip eqal DBSIMPLE_SKIP
+if (!defined('DBEASY_SKIP'))
+    define('DBEASY_SKIP', log(0));
 
 class DbEasy
 {
@@ -31,8 +32,7 @@ class DbEasy
 
     public function __construct($dsn)
     {
-        $dsnHelper = new DSNHelper();
-        $scheme = $dsnHelper->parseScheme($dsn);
+        $scheme = DSNHelper::parseScheme($dsn);
 
         if(is_null($scheme))
             throw new \Exception("Couldn't parse scheme from DSN: " . $dsn);

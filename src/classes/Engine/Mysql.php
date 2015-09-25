@@ -13,10 +13,11 @@ class Mysql extends AbstractEngine implements EngineInterface
     /** @var \PDO  $dbLink */
     private $dbLink;
 
+
+
     public function connect($dsn)
     {
-        $dsnHelper = new DSNHelper();
-        $parsedDSN = $dsnHelper->parse($dsn);
+        $parsedDSN = DSNHelper::parse($dsn);
 
         if(is_null($parsedDSN))
             throw new \Exception("Couldn't parse DSN: " . $dsn);
@@ -41,7 +42,16 @@ class Mysql extends AbstractEngine implements EngineInterface
             var_dump($stmt->errorInfo(), $query, $params);exit;
         };
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if(empty($result)){
+            if(preg_match('/^\s* INSERT \s+/six', $query))
+                $result = $this->dbLink->lastInsertId();
+            if(preg_match('/^\s* DELETE|UPDATE \s+/six', $query))
+                $result = $stmt->rowCount();
+        }
+
+        return $result;
     }
 
     public function getQuery($query, $params)

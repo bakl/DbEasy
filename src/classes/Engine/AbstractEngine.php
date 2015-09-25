@@ -11,6 +11,8 @@ namespace DbEasy\Engine;
 class AbstractEngine
 {
     protected $identPrefix = "";
+    protected $error;
+    protected $errmsg;
 
     public function setIdentPrefix($prefix){
         $this->identPrefix = $prefix;
@@ -21,7 +23,7 @@ class AbstractEngine
         $unusedParams = array();
 
         $query = preg_replace_callback(
-            "/(\?(?:#|f|d|a|_)*)+([^\{\}\/,\.\s\(\)]+)*/",
+            "/(\?(?:#|f|d|a|_)*)+([^\{\}\/,\.\s\(\)]+)*/si",
             function($matches) use (&$params, &$unusedParams, $expandNative){
                 $placeHolder = $matches[1];
                 $placeHolderParam = (isset($matches[2])) ? $matches[2] : "";
@@ -39,7 +41,7 @@ class AbstractEngine
                         break;
                     case "?a":
                         $arrayParams = array_pop($params);
-                        if($arrayParams == DBSIMPLE_SKIP) return DBSIMPLE_SKIP;
+                        if($arrayParams == DBEASY_SKIP) return DBEASY_SKIP;
                         array_walk($arrayParams, function(&$item, &$key){
                             $item = $this->escapeParam($item);
                             if(!is_int($key)) {
@@ -70,12 +72,12 @@ class AbstractEngine
             "/\{(\s|.*?)\}/si",
             function($matches)  use (&$unusedParams) {
 //                var_dump($matches);
-                if(preg_match("/".DBSIMPLE_SKIP."/", $matches[1]))
+                if(preg_match("/".DBEASY_SKIP."/", $matches[1]))
                     return "";
                 if(preg_match_all("/\?/", $matches[1], $matchesPlaceholders)) {
                     $found = false;
                     for ($i = 0; $i < count($matchesPlaceholders[0]); $i++) {
-                        if ($unusedParams[$i] == DBSIMPLE_SKIP || $found) {
+                        if ($unusedParams[$i] == DBEASY_SKIP || $found) {
                             unset($unusedParams[$i]);
                             $found = true;
                         }
