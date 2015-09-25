@@ -9,6 +9,7 @@ use DbEasy\DbEasy;
  */
 class DbEasyTest extends PHPUnit_Framework_TestCase
 {
+    /** @var  DbEasy $db */
     private $db;
 
     public function setUp(){
@@ -32,5 +33,36 @@ class DbEasyTest extends PHPUnit_Framework_TestCase
 
 //        var_dump($result);
         $this->assertEquals(array('Vasya', 'Maria'), $result);
+    }
+
+    public function testQueryWithIdentifierPlaceHolder()
+    {
+        $result = $this->db->selectCol(
+            "SELECT name FROM ?# WHERE id IN (?a) AND id != ?",
+            'human',
+            array(1,2),
+            3
+        );
+
+//        var_dump($result);
+        $this->assertEquals(array('Vasya', 'Maria'), $result);
+    }
+
+    public function testQueryWithIntPlaceHolder()
+    {
+        $result = $this->db->selectCol("SELECT name FROM human WHERE id = ?d", 3);
+
+//        var_dump($result);
+        $this->assertEquals(array('George'), $result);
+    }
+
+    public function testQueryAssociativePlaceHolder()
+    {
+        $this->db->query("UPDATE human SET ?a WHERE id = ", array('id' => 9999), 3);
+        $this->db->query("UPDATE human SET ?a WHERE id = ", array('id' => 3), 3);
+
+        $result = $this->db->selectCol("SELECT name FROM human WHERE id = ?d", 3);
+//        var_dump($result);
+        $this->assertEquals(array('George'), $result);
     }
 }

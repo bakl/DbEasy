@@ -34,7 +34,7 @@ class Mysql extends AbstractEngine implements EngineInterface
         //Befory query expand non-native placeholders
         list($query, $params) = $this->expandPlaceHolders($query, $params);
 
-//        var_dump($query, $params);
+        var_dump($query, $params);
 
         $stmt = $this->dbLink->prepare($query);
         $stmt->execute($params);
