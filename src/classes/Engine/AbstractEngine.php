@@ -20,7 +20,11 @@ class AbstractEngine
                 $placeHolder = $matches[0];
                 switch($placeHolder){
                     case "?a":
-                        return implode(',', array_pop($params));
+                        $arrayParams = array_pop($params);
+                        array_walk($arrayParams, function(&$item){
+                            $item = $this->escapeParam($item);
+                        });
+                        return implode(',', $arrayParams);
                         break;
                     case "?":
                         array_push($unusedParams, array_pop($params));
@@ -37,7 +41,18 @@ class AbstractEngine
         return array($query, $unusedParams);
     }
 
-    protected escape()
+    protected function escapeParam($param){
+        if(is_int($param))
+            return $param;
+        if(is_float($param))
+            return str_replace(',', '.', $param);
+
+        return $this->escapeOnDbLayer($param);
+    }
+
+    protected function escapeOnDbLayer($param){
+        return $param;
+    }
 
 
 }

@@ -9,17 +9,28 @@ use DbEasy\DbEasy;
  */
 class DbEasyTest extends PHPUnit_Framework_TestCase
 {
+    private $db;
+
+    public function setUp(){
+        $this->db = new DbEasy("mysql://root:CeRf@localhost/exercise");
+    }
+
     public function testSimpleQuery()
     {
-//        $db = new DbEasy("mysql://root:CeRf@localhost/exercise");
-//        $result = $db->selectCol("SELECT id FROM human WHERE id = ?", 1);
-        $this->assertTrue(true);
+        $result = $this->db->selectCol("SELECT name FROM human WHERE id = ?", 1);
+//        var_dump($result);
+        $this->assertEquals(array('Vasya'), $result);
     }
 
     public function testQueryWithArrayPlaceHolder()
     {
-        $db = new DbEasy("mysql://root:CeRf@localhost/exercise");
-        $result = $db->selectCol("SELECT id FROM human WHERE id IN (?a) AND id IN (?a) AND id != ? AND id != ?", array(1), array(2), 1, 2);
-        $this->assertTrue(true);
+        $result = $this->db->selectCol(
+            "SELECT name FROM human WHERE id IN (?a) AND id != ?",
+            array(1,2),
+            3
+        );
+
+//        var_dump($result);
+        $this->assertEquals(array('Vasya', 'Maria'), $result);
     }
 }
