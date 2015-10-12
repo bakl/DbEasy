@@ -6,6 +6,14 @@
  */
 namespace DbEasy\Engine;
 
+
+/**
+ * NOT USE IT!!!!
+ *
+ * Interface EngineInterface
+ * @package DbEasy\Engine
+ * @deprecated
+ */
 interface EngineInterface
 {
     public function connect($dsn);

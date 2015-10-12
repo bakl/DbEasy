@@ -1,6 +1,6 @@
 <?php
 
-use DbEasy\DbEasy;
+use DbEasy\Database;
 
 /**
  * User: sergeymartyanov
@@ -9,11 +9,11 @@ use DbEasy\DbEasy;
  */
 class DbEasyTest extends PHPUnit_Framework_TestCase
 {
-    /** @var  DbEasy $db */
+    /** @var Database $db */
     private $db;
 
     public function setUp(){
-        $this->db = new DbEasy("mysql://root:CeRf@127.0.0.1/exercise");
+        $this->db = Database::connect("mysql://root:CeRf@127.0.0.1/exercise");
     }
 
     public function testSimpleQuery()

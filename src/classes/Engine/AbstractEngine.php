@@ -8,6 +8,13 @@
 namespace DbEasy\Engine;
 
 
+/**
+ * NOT USE IT!!!!
+ *
+ * Class AbstractEngine
+ * @package DbEasy\Engine
+ * @deprecated
+ */
 class AbstractEngine
 {
     protected $identPrefix = "";

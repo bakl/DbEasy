@@ -1,12 +1,14 @@
 <?php
 
 namespace DbEasy\Engine;
-use DbEasy\Helpers\DSNHelper;
+
 
 /**
- * User: sergeymartyanov
- * Date: 24.09.15
- * Time: 23:54
+ * NOT USE IT!!!!
+ *
+ * Class Mysql
+ * @package DbEasy\Engine
+ * @deprecated
  */
 class Mysql extends AbstractEngine implements EngineInterface
 {
