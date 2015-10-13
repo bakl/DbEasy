@@ -69,6 +69,6 @@ class Mysql extends AdapterAbstract
      */
     public function quote($value)
     {
-        // TODO: Implement quote() method.
+        return $this->connection->quote($value);
     }
 }

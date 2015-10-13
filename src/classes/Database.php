@@ -91,6 +91,7 @@ class Database
         $adapter = $this->getAdapter();
 
         $query = $this->transformQuery($query);
+        var_dump($query);
         $result = $adapter->execute($query);
 
         $error = $this->adapter->getLastError();
@@ -142,11 +143,9 @@ class Database
         return array();
     }
 
-    public function getQuery($query){
-        $params = array_slice((is_array($query)) ? $query : func_get_args(), 1);
-        $query = (is_array($query)) ? $query[0] : $query;
-
-        return $this->transformQuery($query, $params, true);
+    public function getQuery($sql){
+        $query = Query::createByArray(func_get_args());
+        return $this->transformQuery($query, true);
     }
 
     public function setIdentPrefix($prefix)
@@ -246,13 +245,27 @@ class Database
             )
         }sx';
 
-        $values = [];
+        $values = $query->getValues();
         $transformQueryAsText = preg_replace_callback(
             $re,
             function ($matches) use ($expandValues, &$values) {
-                if (!empty($matches[2])) {
+                $values = array_reverse($values);
+
+                $currentValue = array_pop($values);
+                $replacement = $this->adapter->getNativePlaceholder(1);
+                if(!empty($matches[3])) {
                     $placeholder = $this->getPlaceholder($matches[3]);
+                    if(is_null($placeholder))
+                        throw new DatabaseException("Placeholder ?" . $matches[3] . " not found");
+                    $replacement = $placeholder->transformValue($currentValue, $expandValues, $this->adapter->getNativePlaceholder(1));
                 }
+
+                if(!$expandValues) {
+                    array_push($values, $currentValue);
+                } else {
+                    $replacement = $currentValue;
+                }
+                return $replacement;
             },
             $query->getQueryAsText()
         );
