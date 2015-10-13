@@ -9,8 +9,9 @@ namespace DbEasy\Adapter;
 
 
 use DbEasy\DSN;
+use DbEasy\Query;
 
-abstract class AdapterAbstract implements QuoteInterface
+abstract class AdapterAbstract
 {
     /**
      * @var DSN

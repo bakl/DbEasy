@@ -7,7 +7,6 @@
 
 namespace DbEasy\Adapter;
 
-use DbEasy\Adapter\AdapterAbstract;
 use DbEasy\Query;
 
 class Mysql extends AdapterAbstract
@@ -17,7 +16,15 @@ class Mysql extends AdapterAbstract
      */
     protected function connect()
     {
-        // TODO: Implement connection() method.
+        $this->connection = new \PDO(
+            sprintf(
+                'mysql:dbname=%s;host=%s',
+                ltrim($this->dsn->getPath(),'/'),
+                $this->dsn->getHost()
+            ),
+            $this->dsn->getUser(),
+            $this->dsn->getPassword()
+        );
     }
 
     /**
@@ -26,7 +33,24 @@ class Mysql extends AdapterAbstract
      */
     protected function executeQuery(Query $query)
     {
-        // TODO: Implement _execute() method.
+
+        $stmt = $this->connection->prepare($query->getQueryAsText());
+//        var_dump($query, $params);
+        if(!$stmt->execute($query->getValues())){
+//            echo my_backtrace();
+            var_dump($stmt->errorInfo(), $query);exit;
+        };
+
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if(empty($result)){
+            if(preg_match('/^\s* INSERT \s+/six', $query))
+                $result = $this->connection->lastInsertId();
+            if(preg_match('/^\s* DELETE|UPDATE \s+/six', $query))
+                $result = $stmt->rowCount();
+        }
+
+        return $result;
     }
 
     public function getRegexpForIgnorePlaceholder()

@@ -19,7 +19,7 @@ class DbEasyTest extends PHPUnit_Framework_TestCase
     public function testSimpleQuery()
     {
         $result = $this->db->selectCol("SELECT name FROM human WHERE id = ?", 1);
-//        var_dump($result);
+        var_dump($result);
         $this->assertEquals(array('Vasya'), $result);
     }
 

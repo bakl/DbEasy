@@ -18,6 +18,10 @@ use DbEasy\Placeholder\Reference;
 use DbEasy\Placeholder\ValuesList;
 use DbEasy\Placeholder\WholeNumber;
 
+//Define skip eqal DBSIMPLE_SKIP
+if (!defined('DBEASY_SKIP'))
+    define('DBEASY_SKIP', log(0));
+
 class Database
 {
 
@@ -55,6 +59,7 @@ class Database
     private function __construct(DSN $dsn)
     {
         $this->dsn = $dsn;
+        $this->initDefaultPlaceholders();
     }
 
     /**
@@ -81,12 +86,11 @@ class Database
      */
     public function query($sql)
     {
-        $params = array_slice((is_array($sql)) ? $sql : func_get_args(), 1);
-        $query = (is_array($sql)) ? $sql[0] : $sql;
+        $query = Query::createByArray(func_get_args());
 
         $adapter = $this->getAdapter();
 
-        $query = $this->transformQuery($query, $params);
+        $query = $this->transformQuery($query);
         $result = $adapter->execute($query);
 
         $error = $this->adapter->getLastError();
@@ -167,6 +171,7 @@ class Database
         if(class_exists($engineClassName)){
             $this->adapter = new $engineClassName();
             $this->adapter->setDsn($this->dsn);
+            return $this->adapter;
         }
 
         return null;
@@ -211,7 +216,7 @@ class Database
      * @param bool $expandValues
      * @return Query
      */
-    public function transformQuery($query, $params, $expandValues = false)
+    public function transformQuery(Query $query,  $expandValues = false)
     {
         $re = '{
             (?>
@@ -249,7 +254,7 @@ class Database
                     $placeholder = $this->getPlaceholder($matches[3]);
                 }
             },
-            $query
+            $query->getQueryAsText()
         );
 
         return Query::create($transformQueryAsText, $values);
