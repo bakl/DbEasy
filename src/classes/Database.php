@@ -246,25 +246,21 @@ class Database
         }sx';
 
         $values = $query->getValues();
+        $preparedValues = array();
+
         $transformQueryAsText = preg_replace_callback(
             $re,
             function ($matches) use ($expandValues, &$values) {
                 $values = array_reverse($values);
 
-                $currentValue = array_pop($values);
                 $replacement = $this->adapter->getNativePlaceholder(1);
                 if(!empty($matches[3])) {
                     $placeholder = $this->getPlaceholder($matches[3]);
                     if(is_null($placeholder))
                         throw new DatabaseException("Placeholder ?" . $matches[3] . " not found");
-                    $replacement = $placeholder->transformValue($currentValue, $expandValues, $this->adapter->getNativePlaceholder(1));
+                    $replacement = $placeholder->transformValue($values, $expandValues, $this->adapter->getNativePlaceholder(1));
                 }
 
-                if(!$expandValues) {
-                    array_push($values, $currentValue);
-                } else {
-                    $replacement = $currentValue;
-                }
                 return $replacement;
             },
             $query->getQueryAsText()

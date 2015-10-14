@@ -15,9 +15,11 @@ class Common implements PlaceholderInterface
 
     /**
      * @param $value
+     * @param $expandValue
+     * @param $nativePlaceholder
      * @return mixed
      */
-    public function transformValue($value)
+    public function transformValue($value, $expandValue, $nativePlaceholder)
     {
         return $value;
     }

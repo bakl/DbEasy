@@ -4,16 +4,17 @@
  * @author: Sergey Martyanov <s-m-box@ya.ru>
  * @since: 10.09.15
  */
-
 namespace DbEasy\Placeholder;
 
 interface PlaceholderInterface
 {
     /**
      * @param $value
+     * @param $expandValue
+     * @param $nativePlaceholder
      * @return mixed
      */
-    public function transformValue($value);
+    public function transformValue($value, $expandValue, $nativePlaceholder);
 
     /**
      * @param $subQuery

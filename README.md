@@ -4,7 +4,9 @@ Powerful inteface for database
 with inteface DbSimple
 
 
+
 check list:
+
 <br/> 1. Fetch all resulting rows
 <br/> 2. Fetch one page 
 <br/> 3. Macro-substitutions in SQL queries
