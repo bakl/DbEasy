@@ -83,13 +83,16 @@ abstract class AdapterAbstract
         return $result;
     }
 
+
     /**
+     * null if db without native placeholders
      * @return string
      */
-    public function getNativePlaceholder($n)
+    public function getNativeCommonPlaceholder($n)
     {
         return '?';
     }
+
 
     /**
      * @return array

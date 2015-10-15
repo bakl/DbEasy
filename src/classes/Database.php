@@ -55,15 +55,16 @@ class Database
 
     /**
      * constructor disabled
+     * @param DSN $dsn
      */
-    private function __construct(DSN $dsn)
+    public function __construct(DSN $dsn)
     {
         $this->dsn = $dsn;
         $this->initDefaultPlaceholders();
     }
 
     /**
-     * @param string $dsn
+     * @param $dsnString
      * @return Database
      * @throws DatabaseException
      */
@@ -106,26 +107,26 @@ class Database
     public function select()
     {
 
-        $result = call_user_func_array(array($this, 'query') , func_get_args());
+        $result = call_user_func_array(array($this, 'query'), func_get_args());
 
         return $result;
     }
 
     public function selectRow()
     {
-        $result = call_user_func_array(array($this, 'query') , func_get_args());
+        $result = call_user_func_array(array($this, 'query'), func_get_args());
 
-        if(isset($result[0]))
+        if (isset($result[0]))
             return $result[0];
         return array();
     }
 
     public function selectCell()
     {
-        $result = call_user_func_array(array($this, 'query') , func_get_args());
+        $result = call_user_func_array(array($this, 'query'), func_get_args());
 
 
-        if(isset($result[0]) && count($result[0])) {
+        if (isset($result[0]) && count($result[0])) {
             return array_pop($result[0]);
         }
         return "";
@@ -133,9 +134,9 @@ class Database
 
     public function selectCol()
     {
-        $result = call_user_func_array(array($this, 'query') , func_get_args());
+        $result = call_user_func_array(array($this, 'query'), func_get_args());
 
-        if(isset($result[0])) {
+        if (isset($result[0])) {
             $columnName = array_keys($result[0])[0];
             return array_column($result, $columnName);
         }
@@ -143,7 +144,8 @@ class Database
         return array();
     }
 
-    public function getQuery($sql){
+    public function getQuery($sql)
+    {
         $query = Query::createByArray(func_get_args());
         return $this->transformQuery($query, true);
     }
@@ -160,14 +162,15 @@ class Database
         $this->adapter->setDsn($this->dsn);
     }
 
-    private function getAdapter(){
-        if(!is_null($this->adapter)){
+    public function getAdapter()
+    {
+        if (!is_null($this->adapter)) {
             return $this->adapter;
         }
 
         $engineClassName = "DbEasy\\Adapter\\" . ucfirst($this->dsn->getScheme());
 
-        if(class_exists($engineClassName)){
+        if (class_exists($engineClassName)) {
             $this->adapter = new $engineClassName();
             $this->adapter->setDsn($this->dsn);
             return $this->adapter;
@@ -183,14 +186,15 @@ class Database
 
     private function getPlaceholder($name)
     {
-        if(isset($this->placeholders[$name]))
+        if (isset($this->placeholders[$name]))
             return $this->placeholders[$name];
 
         return null;
     }
 
 
-    private function getPlaceholdersRegexpString(){
+    private function getPlaceholdersRegexpString()
+    {
         $regexp = "";
         /** @var PlaceholderInterface $placeholder */
         foreach ($this->placeholders as $placeholder) {
@@ -209,13 +213,12 @@ class Database
     }
 
 
-
     /**
      * @param Query $query
      * @param bool $expandValues
      * @return Query
      */
-    public function transformQuery(Query $query,  $expandValues = false)
+    public function transformQuery(Query $query, $expandValues = false)
     {
         $re = '{
             (?>
@@ -241,24 +244,46 @@ class Database
               |
             (?>
                 # Placeholder
-                (\?) ( ['. $this->getPlaceholdersRegexpString() .']? )                           #2 #3
+                (\?) ( [' . $this->getPlaceholdersRegexpString() . ']? )                           #2 #3
             )
         }sx';
 
         $values = $query->getValues();
-        $preparedValues = array();
+        $preparedValues = [];
+        $numPlaceholder = 0;
 
         $transformQueryAsText = preg_replace_callback(
             $re,
-            function ($matches) use ($expandValues, &$values) {
-                $values = array_reverse($values);
+            function ($matches) use ($expandValues, &$values, &$preparedValues, &$numPlaceholder) {
+                $replacement = '';
 
-                $replacement = $this->adapter->getNativePlaceholder(1);
-                if(!empty($matches[3])) {
+                if (!empty($matches[0])) {
+                    $replacement = $matches[0];
+                }
+
+                if (!empty($matches[2]) && !empty($matches[3])) {
+                    $numPlaceholder++;
                     $placeholder = $this->getPlaceholder($matches[3]);
-                    if(is_null($placeholder))
+
+                    if (is_null($placeholder)) {
                         throw new DatabaseException("Placeholder ?" . $matches[3] . " not found");
-                    $replacement = $placeholder->transformValue($values, $expandValues, $this->adapter->getNativePlaceholder(1));
+                    }
+
+                    $value = array_shift($values);
+                    if ($expandValues) {
+                        $replacement = $placeholder->transformPlaceholder($value);
+                    } else {
+                        $replacement = $placeholder->transformPlaceholder($value, $this->adapter->getNativeCommonPlaceholder($numPlaceholder));
+
+                        $preparedValue = $placeholder->transformValue($value);
+                        if (!empty($preparedValue)) {
+                            if (is_array($preparedValue)) {
+                                $preparedValues = array_merge($preparedValues, $preparedValue);
+                            } else {
+                                $preparedValues = array_merge($preparedValues, [$preparedValue]);
+                            }
+                        }
+                    }
                 }
 
                 return $replacement;
@@ -266,19 +291,19 @@ class Database
             $query->getQueryAsText()
         );
 
-        return Query::create($transformQueryAsText, $values);
+        return Query::create($transformQueryAsText, $preparedValues);
     }
 
 
     private function initDefaultPlaceholders()
     {
-        $this->setPlaceholder(new Common());
-        $this->setPlaceholder(new Float());
-        $this->setPlaceholder(new Identifier());
-        $this->setPlaceholder(new Prefix());
-        $this->setPlaceholder(new Reference());
-        $this->setPlaceholder(new ValuesList());
-        $this->setPlaceholder(new WholeNumber());
+//        $this->setPlaceholder(new Common());
+//        $this->setPlaceholder(new Float());
+//        $this->setPlaceholder(new Identifier());
+//        $this->setPlaceholder(new Prefix());
+//        $this->setPlaceholder(new Reference());
+//        $this->setPlaceholder(new ValuesList());
+//        $this->setPlaceholder(new WholeNumber());
     }
 
 }
