@@ -261,7 +261,7 @@ class Database
                     $replacement = $matches[0];
                 }
 
-                if (!empty($matches[2]) && !empty($matches[3])) {
+                if (!empty($matches[2])) {
                     $numPlaceholder++;
                     $placeholder = $this->getPlaceholder($matches[3]);
 
