@@ -17,16 +17,18 @@ class Float implements PlaceholderInterface
      */
     public function transformValue($value)
     {
-        // TODO: Implement transformValue() method.
+        return floatval($value);
     }
 
     /**
      * @param $value
      * @param string $nativePlaceholder
+     * @param string $prefix
+     * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
     {
-        // TODO: Implement transformPlaceholder() method.
+        return (empty($nativePlaceholder)) ? $value : $nativePlaceholder;
     }
 
     /**

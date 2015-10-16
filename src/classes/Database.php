@@ -91,6 +91,7 @@ class Database
 
         $adapter = $this->getAdapter();
 
+        var_dump($query);
         $query = $this->transformQuery($query);
         var_dump($query);
         $result = $adapter->execute($query);
@@ -261,6 +262,11 @@ class Database
                     $replacement = $matches[0];
                 }
 
+                //For common placeholder work
+                if(empty($matches[3])){
+                    $matches[3] = $matches[2];
+                }
+
                 if (!empty($matches[2])) {
                     $numPlaceholder++;
                     $placeholder = $this->getPlaceholder($matches[3]);
@@ -276,7 +282,7 @@ class Database
                         $replacement = $placeholder->transformPlaceholder($value, $this->adapter->getNativeCommonPlaceholder($numPlaceholder));
 
                         $preparedValue = $placeholder->transformValue($value);
-                        if (!empty($preparedValue)) {
+                        if (!is_null($preparedValue)) {
                             if (is_array($preparedValue)) {
                                 $preparedValues = array_merge($preparedValues, $preparedValue);
                             } else {
@@ -297,13 +303,13 @@ class Database
 
     private function initDefaultPlaceholders()
     {
-//        $this->setPlaceholder(new Common());
-//        $this->setPlaceholder(new Float());
-//        $this->setPlaceholder(new Identifier());
-//        $this->setPlaceholder(new Prefix());
-//        $this->setPlaceholder(new Reference());
-//        $this->setPlaceholder(new ValuesList());
-//        $this->setPlaceholder(new WholeNumber());
+        $this->setPlaceholder(new Common());
+        $this->setPlaceholder(new Float());
+        $this->setPlaceholder(new Identifier());
+        $this->setPlaceholder(new Prefix());
+        $this->setPlaceholder(new Reference());
+        $this->setPlaceholder(new ValuesList());
+        $this->setPlaceholder(new WholeNumber());
     }
 
 }

@@ -23,10 +23,11 @@ class Reference implements PlaceholderInterface
 
     /**
      * @param $value
-     * @param $nativePlaceholder
+     * @param string $nativePlaceholder
+     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
     {
         // TODO: Implement transformPlaceholder() method.
     }
