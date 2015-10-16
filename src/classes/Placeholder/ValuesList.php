@@ -8,18 +8,15 @@
 namespace DbEasy\Placeholder;
 
 
-use DbEasy\PlaceholderAbstract;
 
 class ValuesList implements PlaceholderInterface
 {
 
     /**
      * @param $value
-     * @param $expandValue
-     * @param $nativePlaceholder
      * @return mixed
      */
-    public function transformValue($value, $expandValue, $nativePlaceholder)
+    public function transformValue($value)
     {
 
         var_dump($value);exit;
@@ -27,12 +24,13 @@ class ValuesList implements PlaceholderInterface
     }
 
     /**
-     * @param $subQuery
-     * @return mixed
+     * @param $value
+     * @param $nativePlaceholder
+     * @return string
      */
-    public function transformSubQuery($subQuery)
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-        // TODO: Implement transformSubQuery() method.
+        // TODO: Implement transformPlaceholder() method.
     }
 
     /**
@@ -50,4 +48,6 @@ class ValuesList implements PlaceholderInterface
     {
         return "a";
     }
+
+
 }

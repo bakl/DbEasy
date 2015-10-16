@@ -15,22 +15,21 @@ class Common implements PlaceholderInterface
 
     /**
      * @param $value
-     * @param $expandValue
-     * @param $nativePlaceholder
      * @return mixed
      */
-    public function transformValue($value, $expandValue, $nativePlaceholder)
+    public function transformValue($value)
     {
         return $value;
     }
 
     /**
-     * @param $subQuery
-     * @return mixed
+     * @param $value
+     * @param $nativePlaceholder
+     * @return string
      */
-    public function transformSubQuery($subQuery)
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-
+        // TODO: Implement transformPlaceholder() method.
     }
 
     /**
@@ -48,4 +47,6 @@ class Common implements PlaceholderInterface
     {
         return "s";
     }
+
+
 }

@@ -14,22 +14,21 @@ class Reference implements PlaceholderInterface
 
     /**
      * @param $value
-     * @param $expandValue
-     * @param $nativePlaceholder
      * @return mixed
      */
-    public function transformValue($value, $expandValue, $nativePlaceholder)
+    public function transformValue($value)
     {
         // TODO: Implement transformValue() method.
     }
 
     /**
-     * @param $subQuery
-     * @return mixed
+     * @param $value
+     * @param $nativePlaceholder
+     * @return string
      */
-    public function transformSubQuery($subQuery)
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-        // TODO: Implement transformSubQuery() method.
+        // TODO: Implement transformPlaceholder() method.
     }
 
     /**
@@ -47,4 +46,6 @@ class Reference implements PlaceholderInterface
     {
         return "n";
     }
+
+
 }
