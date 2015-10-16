@@ -91,6 +91,7 @@ class Database
 
         $adapter = $this->getAdapter();
 
+        var_dump($query);
         $query = $this->transformQuery($query);
         var_dump($query);
         $result = $adapter->execute($query);
@@ -255,36 +256,41 @@ class Database
         $transformQueryAsText = preg_replace_callback(
             $re,
             function ($matches) use ($expandValues, &$values, &$preparedValues, &$numPlaceholder) {
-                    $replacement = '';
+                $replacement = '';
 
-                    if (!empty($matches[0])) {
-                        $replacement = $matches[0];
+                if (!empty($matches[0])) {
+                    $replacement = $matches[0];
+                }
+
+                //For common placeholder work
+                if(empty($matches[3])){
+                    $matches[3] = $matches[2];
+                }
+
+                if (!empty($matches[2])) {
+                    $numPlaceholder++;
+                    $placeholder = $this->getPlaceholder($matches[3]);
+
+                    if (is_null($placeholder)) {
+                        throw new DatabaseException("Placeholder ?" . $matches[3] . " not found");
                     }
 
-                    if (!empty($matches[2])) {
-                        $numPlaceholder++;
-                        $placeholder = $this->getPlaceholder($matches[3]);
+                    $value = array_shift($values);
+                    if ($expandValues) {
+                        $replacement = $placeholder->transformPlaceholder($value);
+                    } else {
+                        $replacement = $placeholder->transformPlaceholder($value, $this->adapter->getNativeCommonPlaceholder($numPlaceholder));
 
-                        if (is_null($placeholder)) {
-                            throw new DatabaseException("Placeholder ?" . $matches[3] . " not found");
-                        }
-
-                        $value = array_shift($values);
-                        if ($expandValues) {
-                            $replacement = $placeholder->transformPlaceholder($value);
-                        } else {
-                            $replacement = $placeholder->transformPlaceholder($value, $this->adapter->getNativeCommonPlaceholder($numPlaceholder));
-
-                            $preparedValue = $placeholder->transformValue($value);
-                            if (!empty($preparedValue)) {
-                                if (is_array($preparedValue)) {
-                                    $preparedValues = array_merge($preparedValues, $preparedValue);
-                                } else {
-                                    $preparedValues = array_merge($preparedValues, [$preparedValue]);
-                                }
+                        $preparedValue = $placeholder->transformValue($value);
+                        if (!is_null($preparedValue)) {
+                            if (is_array($preparedValue)) {
+                                $preparedValues = array_merge($preparedValues, $preparedValue);
+                            } else {
+                                $preparedValues = array_merge($preparedValues, [$preparedValue]);
                             }
                         }
                     }
+                }
 
                 return $replacement;
             },

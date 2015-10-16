@@ -18,18 +18,31 @@ class ValuesList implements PlaceholderInterface
      */
     public function transformValue($value)
     {
-        return $value;
+        //@TODO escape
+        return array_values($value);
     }
 
     /**
      * @param $value
-     * @param $nativePlaceholder
+     * @param string $nativePlaceholder
+     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
     {
-        $values = (empty($nativePlaceholder)) ? $value : array_fill(0, count($value), $nativePlaceholder);
-        return implode(",", $values);
+        $resultValues = array();
+        foreach ($value as $valueRowKey => $valueRowData) {
+            //@TODO escape $valueRowData as value
+            //$valueRowData = escape($valueRowData);
+            if(!is_int($valueRowKey)){
+                //@TODO escape $valueRowKey as identifier
+                $resultValues[] = implode("=", array($valueRowKey, (empty($nativePlaceholder)) ? $valueRowData : $nativePlaceholder));
+            } else {
+                $resultValues[] = (empty($nativePlaceholder)) ? $valueRowData : $nativePlaceholder;
+            }
+        }
+
+        return implode(",", $resultValues);
     }
 
     /**

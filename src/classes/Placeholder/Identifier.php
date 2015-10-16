@@ -17,17 +17,19 @@ class Identifier implements PlaceholderInterface
      */
     public function transformValue($value)
     {
-        // TODO: Implement transformValue() method.
+        return null;
     }
 
     /**
      * @param $value
-     * @param $nativePlaceholder
+     * @param string $nativePlaceholder
+     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
     {
-        // TODO: Implement transformPlaceholder() method.
+        //@TODO escape as identifier
+        return $value;
     }
 
     /**

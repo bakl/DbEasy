@@ -75,7 +75,7 @@ class DbEasyTest extends PHPUnit_Framework_TestCase
             WHERE
              id = ?d
              {AND id != ? OR id != ?}
-             {AND id != ?}", 3, \DbEasy\DBEASY_SKIP, 4, 5
+             {AND id != ?}", 3, DBEASY_SKIP, 4, 5
         );
         $this->assertEquals(array('George'), $result);
     }
