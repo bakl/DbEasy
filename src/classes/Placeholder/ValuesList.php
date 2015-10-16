@@ -18,9 +18,7 @@ class ValuesList implements PlaceholderInterface
      */
     public function transformValue($value)
     {
-
-        var_dump($value); exit;
-        // TODO: Implement transformValue() method.
+        return $value;
     }
 
     /**
@@ -30,7 +28,8 @@ class ValuesList implements PlaceholderInterface
      */
     public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-        // TODO: Implement transformPlaceholder() method.
+        $values = (empty($nativePlaceholder)) ? $value : array_fill(0, count($value), $nativePlaceholder);
+        return implode(",", $values);
     }
 
     /**
