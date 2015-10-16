@@ -19,7 +19,7 @@ class ValuesList implements PlaceholderInterface
     public function transformValue($value)
     {
 
-        var_dump($value);exit;
+        var_dump($value); exit;
         // TODO: Implement transformValue() method.
     }
 
