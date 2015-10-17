@@ -14,7 +14,6 @@ interface PlaceholderInterface
      */
     public function transformValue($value);
 
-
     /**
      * @param $value
      * @param string $nativePlaceholder
@@ -22,7 +21,6 @@ interface PlaceholderInterface
      * @return string
      */
     public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '');
-
 
     /**
      * @return string

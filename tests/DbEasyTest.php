@@ -1,13 +1,16 @@
 <?php
-
-use DbEasy\Database;
-
 /**
  * User: sergeymartyanov
  * Date: 25.09.15
  * Time: 0:02
  */
-class DbEasyTest extends PHPUnit_Framework_TestCase
+
+namespace DbEasy\Tests;
+
+
+use DbEasy\Database;
+
+class DbEasyTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Database $db */
     private $db;
@@ -75,7 +78,7 @@ class DbEasyTest extends PHPUnit_Framework_TestCase
             WHERE
              id = ?d
              {AND id != ? OR id != ?}
-             {AND id != ?}", 3, DBEASY_SKIP, 4, 5
+             {AND id != ?}", 3, Database::SKIP, 4, 5
         );
         $this->assertEquals(array('George'), $result);
     }
