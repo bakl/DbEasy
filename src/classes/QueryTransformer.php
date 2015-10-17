@@ -149,7 +149,7 @@ class QueryTransformer
 
             $value = array_shift($this->values);
 
-            if ($value == Database::SKIP) {
+            if ($value === Database::SKIP) {
                 $this->isHookSkipValue = true;
             }
 

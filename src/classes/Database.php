@@ -64,7 +64,6 @@ class Database
     private $identPrefix;
 
     /**
-     * constructor disabled
      * @param DSN $dsn
      */
     public function __construct(DSN $dsn)
