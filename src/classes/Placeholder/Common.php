@@ -10,8 +10,15 @@
 namespace DbEasy\Placeholder;
 
 
-class Common implements PlaceholderInterface
+class Common extends PlaceholderAbstract
 {
+    /**
+     * constructor is required for initialization placeholder name
+     */
+    public function __construct()
+    {
+        $this->setName('?');
+    }
 
     /**
      * @param $value
@@ -25,29 +32,10 @@ class Common implements PlaceholderInterface
     /**
      * @param $value
      * @param string $nativePlaceholder
-     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
         return (empty($nativePlaceholder)) ? $value : $nativePlaceholder;
     }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return "?";
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexp()
-    {
-        return "";
-    }
-
-
 }

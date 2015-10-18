@@ -9,8 +9,15 @@ namespace DbEasy\Placeholder;
 
 
 
-class ValuesList implements PlaceholderInterface
+class ValuesList extends PlaceholderAbstract
 {
+    /**
+     * constructor is required for initialization placeholder name
+     */
+    public function __construct()
+    {
+        $this->setName('?a');
+    }
 
     /**
      * @param $value
@@ -25,10 +32,9 @@ class ValuesList implements PlaceholderInterface
     /**
      * @param $value
      * @param string $nativePlaceholder
-     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
         $resultValues = array();
         foreach ($value as $valueRowKey => $valueRowData) {
@@ -44,22 +50,4 @@ class ValuesList implements PlaceholderInterface
 
         return implode(",", $resultValues);
     }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return "a";
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexp()
-    {
-        return "a";
-    }
-
-
 }

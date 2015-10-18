@@ -10,7 +10,7 @@ namespace DbEasy;
 
 use DbEasy\Adapter\AdapterAbstract;
 use DbEasy\Placeholder\PlaceholderCollection;
-use DbEasy\Placeholder\PlaceholderInterface;
+use DbEasy\Placeholder\PlaceholderAbstract;
 
 // for compatibility with dbsimple:
 if (!defined('DBSIMPLE_SKIP')) {
@@ -33,7 +33,7 @@ class Database
     /**
      * constants
      */
-    const SKIP = DBSIMPLE_SKIP;
+    const SKIP_VALUE = DBSIMPLE_SKIP;
     const ARRAY_KEY = DBSIMPLE_ARRAY_KEY;
     const PARENT_KEY = DBSIMPLE_PARENT_KEY;
 
@@ -56,12 +56,6 @@ class Database
      * @var DSN
      */
     private $dsn = null;
-
-    /**
-     * TODO: move to placeholder
-     * @var string
-     */
-    private $identPrefix;
 
     /**
      * @param DSN $dsn
@@ -99,11 +93,9 @@ class Database
     {
         $query = Query::createByArray(func_get_args());
 
-        $adapter = $this->getAdapter();
-
-        $transformer = new QueryTransformer($this->adapter, $this->placeholders);
+        $transformer = new QueryTransformer($this->getAdapter(), $this->placeholders);
         $query = $transformer->transformQuery($query);
-        $result = $adapter->execute($query);
+        $result = $this->getAdapter()->execute($query);
 
         $error = $this->adapter->getLastError();
         if (!empty($error)) {
@@ -161,9 +153,12 @@ class Database
         return $transformer->transformQuery($query, true);
     }
 
+    /**
+     * @param string $prefix
+     */
     public function setIdentPrefix($prefix)
     {
-        $this->identPrefix = $prefix;
+        $this->placeholders->setPrefix($prefix);
     }
 
 
@@ -174,6 +169,7 @@ class Database
     {
         $this->adapter = $adapter;
         $this->adapter->setDsn($this->dsn);
+        $this->placeholders->setQuotePerformer($this->adapter);
     }
 
     /**
@@ -191,6 +187,7 @@ class Database
         if (class_exists($adapterClassName)) {
             $this->adapter = new $adapterClassName();
             $this->adapter->setDsn($this->dsn);
+            $this->placeholders->setQuotePerformer($this->adapter);
             return $this->adapter;
         }
 
@@ -198,11 +195,15 @@ class Database
     }
 
     /**
-     * @param PlaceholderInterface $placeholder
+     * @param PlaceholderAbstract $placeholder
      * @return void
      */
-    public function addCustomPlaceholder(PlaceholderInterface $placeholder)
+    public function addCustomPlaceholder(PlaceholderAbstract $placeholder)
     {
+        if (!empty($this->adapter)) {
+            $placeholder->setQuotePerformer($this->adapter);
+        }
+
         $this->placeholders->addPlaceholder($placeholder);
     }
 

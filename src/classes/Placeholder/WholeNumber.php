@@ -9,8 +9,15 @@ namespace DbEasy\Placeholder;
 
 
 
-class WholeNumber implements PlaceholderInterface
+class WholeNumber extends PlaceholderAbstract
 {
+    /**
+     * constructor is required for initialization placeholder name
+     */
+    public function __construct()
+    {
+        $this->setName('?d');
+    }
 
     /**
      * @param $value
@@ -24,30 +31,10 @@ class WholeNumber implements PlaceholderInterface
     /**
      * @param $value
      * @param string $nativePlaceholder
-     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
         return (empty($nativePlaceholder)) ? $value : $nativePlaceholder;
     }
-
-    /**
-     * @return string
-     *
-     */
-    public function getName()
-    {
-        return "d";
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexp()
-    {
-        return "d";
-    }
-
-
 }

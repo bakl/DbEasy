@@ -8,7 +8,7 @@ namespace DbEasy\Tests\Unit;
 
 
 use DbEasy\Adapter\AdapterAbstract;
-use DbEasy\Placeholder\PlaceholderInterface;
+use DbEasy\Placeholder\PlaceholderAbstract;
 
 class Helper
 {
@@ -31,17 +31,21 @@ class Helper
 
     /**
      * @param $placeholderName
-     * @return \PHPUnit_Framework_MockObject_MockObject | PlaceholderInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject | PlaceholderAbstract
      */
     public static function getMockCustomPlaceholder($placeholderName)
     {
-        $myPlaceholder = \PHPUnit_Framework_MockObject_Generator::getMockForAbstractClass('\DbEasy\Placeholder\PlaceholderInterface');
+        $myPlaceholder = \PHPUnit_Framework_MockObject_Generator::getMockForAbstractClass(
+            '\DbEasy\Placeholder\PlaceholderAbstract',
+            [],
+            '',
+            true,
+            true,
+            true,
+            ['getName']
+        );
         $myPlaceholder->expects(\PHPUnit_Framework_TestCase::any())
             ->method('getName')
-            ->will(\PHPUnit_Framework_TestCase::returnValue($placeholderName));
-
-        $myPlaceholder->expects(\PHPUnit_Framework_TestCase::any())
-            ->method('getRegexp')
             ->will(\PHPUnit_Framework_TestCase::returnValue($placeholderName));
 
         $myPlaceholder->expects(\PHPUnit_Framework_TestCase::any())
@@ -51,6 +55,8 @@ class Helper
                 if ($value === 'in2') return 'out2';
                 if ($value === 'in3') return 'out3';
                 if ($value === 'in4') return 'out4';
+                if ($value === true) return true;
+                if ($value === false) return false;
             }));
 
         $myPlaceholder->expects(\PHPUnit_Framework_TestCase::any())
@@ -63,6 +69,8 @@ class Helper
                 if ($value === 'in2') return '"out2"';
                 if ($value === 'in3') return '"out3"';
                 if ($value === 'in4') return '"out4"';
+                if ($value === true) return 'TRUE';
+                if ($value === false) return 'FALSE';
             }));
 
         return $myPlaceholder;

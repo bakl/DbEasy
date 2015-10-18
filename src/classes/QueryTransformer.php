@@ -145,11 +145,11 @@ class QueryTransformer
 
         if (!empty($matches[2])) {
             $this->numberPlaceholder++;
-            $placeholder = $this->placeholders->getPlaceholder($matches[3]);
+            $placeholder = $this->placeholders->getPlaceholder($matches[0]);
 
             $value = array_shift($this->values);
 
-            if ($value === Database::SKIP) {
+            if ($value === Database::SKIP_VALUE) {
                 $this->isHookSkipValue = true;
             }
 

@@ -8,9 +8,15 @@
 namespace DbEasy\Placeholder;
 
 
-
-class Reference implements PlaceholderInterface
+class Reference extends PlaceholderAbstract
 {
+    /**
+     * constructor is required for initialization placeholder name
+     */
+    public function __construct()
+    {
+        $this->setName('?n');
+    }
 
     /**
      * @param $value
@@ -24,29 +30,10 @@ class Reference implements PlaceholderInterface
     /**
      * @param $value
      * @param string $nativePlaceholder
-     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
         // TODO: Implement transformPlaceholder() method.
     }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return "n";
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexp()
-    {
-        return "n";
-    }
-
-
 }

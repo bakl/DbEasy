@@ -8,8 +8,15 @@
 namespace DbEasy\Placeholder;
 
 
-class Identifier implements PlaceholderInterface
+class Identifier extends PlaceholderAbstract
 {
+    /**
+     * constructor is required for initialization placeholder name
+     */
+    public function __construct()
+    {
+        $this->setName('?#');
+    }
 
     /**
      * @param $value
@@ -23,30 +30,11 @@ class Identifier implements PlaceholderInterface
     /**
      * @param $value
      * @param string $nativePlaceholder
-     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
         //@TODO escape as identifier
         return $value;
     }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return "#";
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexp()
-    {
-        return "\#";
-    }
-
-
 }

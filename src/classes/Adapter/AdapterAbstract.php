@@ -10,8 +10,9 @@ namespace DbEasy\Adapter;
 
 use DbEasy\DSN;
 use DbEasy\Query;
+use DbEasy\QuotePerformerInterface;
 
-abstract class AdapterAbstract
+abstract class AdapterAbstract implements QuotePerformerInterface
 {
     /**
      * @var DSN
@@ -66,7 +67,6 @@ abstract class AdapterAbstract
     {
         $this->dsn = $dsn;
     }
-
 
 
     /**

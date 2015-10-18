@@ -87,4 +87,13 @@ class Sqlite extends AdapterAbstract
 
         return $this->connection->quote($value);
     }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    public function escape($value)
+    {
+        // TODO: Implement escape() method.
+    }
 }

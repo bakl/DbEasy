@@ -8,26 +8,36 @@ namespace DbEasy\Placeholder;
 
 
 use DbEasy\DatabaseException;
+use DbEasy\QuotePerformerInterface;
 
 class PlaceholderCollection
 {
     /**
-     * @var PlaceholderInterface[]
+     * @var string
+     */
+    private $prefix = '';
+
+    /**
+     * @var PlaceholderAbstract[]
      */
     private $placeholders = array();
 
     /**
-     * @param PlaceholderInterface $placeholder
+     * @param PlaceholderAbstract $placeholder
      * @return void
      */
-    public function addPlaceholder(PlaceholderInterface $placeholder)
+    public function addPlaceholder(PlaceholderAbstract $placeholder)
     {
+        if ($placeholder instanceof PlaceholderPrefixInterface) {
+            $placeholder->setPrefix($this->getPrefix());
+        }
+
         $this->placeholders[$placeholder->getName()] = $placeholder;
     }
 
     /**
      * @param $name
-     * @return PlaceholderInterface
+     * @return PlaceholderAbstract
      * @throws DatabaseException
      */
     public function getPlaceholder($name)
@@ -58,12 +68,44 @@ class PlaceholderCollection
      */
     public function getAllPlaceholdersAsString()
     {
-        $regexp = '';
-        /** @var PlaceholderInterface $placeholder */
+        $result = '';
         foreach ($this->placeholders as $placeholder) {
-            $regexp .= $placeholder->getRegexp();
+            $result .= preg_quote(ltrim($placeholder->getName(), '?'));
         }
-        return $regexp;
+
+        return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @param string $prefix
+     */
+    public function setPrefix($prefix)
+    {
+        foreach ($this->placeholders as $placeholder) {
+            if ($placeholder instanceof PlaceholderPrefixInterface) {
+                $placeholder->setPrefix($prefix);
+            }
+        }
+
+        $this->prefix = $prefix;
+    }
+
+    /**
+     * @param QuotePerformerInterface $quotePerformer
+     */
+    public function setQuotePerformer(QuotePerformerInterface $quotePerformer)
+    {
+        foreach ($this->placeholders as $placeholder) {
+            $placeholder->setQuotePerformer($quotePerformer);
+        }
     }
 
 }

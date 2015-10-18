@@ -18,8 +18,8 @@ class QueryTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $myAdapter = Helper::getMockCustomAdapter();
         $myPlaceholders = new PlaceholderCollection();
-        $myPlaceholders->addPlaceholder(Helper::getMockCustomPlaceholder('a'));
-        $myPlaceholders->addPlaceholder(Helper::getMockCustomPlaceholder('b'));
+        $myPlaceholders->addPlaceholder(Helper::getMockCustomPlaceholder('?a'));
+        $myPlaceholders->addPlaceholder(Helper::getMockCustomPlaceholder('?b'));
 
         $transformer = new QueryTransformer($myAdapter, $myPlaceholders);
 
@@ -60,7 +60,7 @@ EXPECTED;
     {
         $myAdapter = Helper::getMockCustomAdapter();
         $placeholders = new PlaceholderCollection();
-        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('m'));
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
 
         $transformer = new QueryTransformer($myAdapter, $placeholders);
         $result = $transformer->transformQuery(
@@ -76,7 +76,7 @@ EXPECTED;
     {
         $myAdapter = Helper::getMockCustomAdapter();
         $placeholders = new PlaceholderCollection();
-        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('m'));
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
 
         $transformer = new QueryTransformer($myAdapter, $placeholders);
         $result = $transformer->transformQuery(
@@ -92,7 +92,7 @@ EXPECTED;
     {
         $myAdapter = Helper::getMockCustomAdapter();
         $placeholders = new PlaceholderCollection();
-        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('m'));
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
 
         $transformer = new QueryTransformer($myAdapter, $placeholders);
         $result = $transformer->transformQuery(
@@ -108,11 +108,11 @@ EXPECTED;
     {
         $myAdapter = Helper::getMockCustomAdapter();
         $placeholders = new PlaceholderCollection();
-        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('m'));
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
 
         $transformer = new QueryTransformer($myAdapter, $placeholders);
         $result = $transformer->transformQuery(
-            Query::create('SQL_TEXT {?m, {?m, {?m, {?m}}}} SQL_TEXT', ['in1', 'in2', Database::SKIP, 'in4']),
+            Query::create('SQL_TEXT {?m, {?m, {?m, {?m}}}} SQL_TEXT', ['in1', 'in2', Database::SKIP_VALUE, 'in4']),
             false
         );
 
@@ -124,15 +124,38 @@ EXPECTED;
     {
         $myAdapter = Helper::getMockCustomAdapter();
         $placeholders = new PlaceholderCollection();
-        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('m'));
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
 
         $transformer = new QueryTransformer($myAdapter, $placeholders);
         $result = $transformer->transformQuery(
-            Query::create('SQL_TEXT ?m,{?m, ?m} ?m SQL_TEXT', ['in1', 'in2', Database::SKIP, 'in3']),
+            Query::create('SQL_TEXT ?m,{?m, ?m} ?m SQL_TEXT', ['in1', 'in2', Database::SKIP_VALUE, 'in3']),
             false
         );
 
         $this->assertEquals('SQL_TEXT ?, ? SQL_TEXT', $result->getQueryAsText());
         $this->assertEquals(['out1', 'out3'], $result->getValues());
+    }
+
+    public function testTransformQuery_CustomAdapterCustomPlaceholderWithCommonNativePlaceholderWithExpandValueRecursiveCallbackFour()
+    {
+        $myAdapter = Helper::getMockCustomAdapter();
+        $placeholders = new PlaceholderCollection();
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
+
+        $transformer = new QueryTransformer($myAdapter, $placeholders);
+
+        $result = $transformer->transformQuery(
+            Query::create('SQL_TEXT {?m, ?m} SQL_TEXT', ['in1', true]),
+            true
+        );
+        $this->assertEquals('SQL_TEXT "out1", TRUE SQL_TEXT', $result->getQueryAsText());
+        $this->assertEquals([], $result->getValues());
+
+        $result = $transformer->transformQuery(
+            Query::create('SQL_TEXT {?m, ?m} SQL_TEXT', ['in1', false]),
+            true
+        );
+        $this->assertEquals('SQL_TEXT "out1", FALSE SQL_TEXT', $result->getQueryAsText());
+        $this->assertEquals([], $result->getValues());
     }
 }

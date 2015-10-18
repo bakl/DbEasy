@@ -8,8 +8,36 @@
 namespace DbEasy\Placeholder;
 
 
-class Prefix implements PlaceholderInterface
+class Prefix extends PlaceholderAbstract implements PlaceholderPrefixInterface
 {
+    /**
+     * @var string
+     */
+    private $prefix;
+
+    /**
+     * constructor is required for initialization placeholder name
+     */
+    public function __construct()
+    {
+        $this->setName('?_');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @param mixed $prefix
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+    }
 
     /**
      * @param $value
@@ -23,30 +51,11 @@ class Prefix implements PlaceholderInterface
     /**
      * @param $value
      * @param string $nativePlaceholder
-     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
         //@TODO need escape with other part of table, this is a problem captian
-        return $prefix;
+        return $this->getPrefix();
     }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return "_";
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexp()
-    {
-        return "_";
-    }
-
-
 }

@@ -8,8 +8,15 @@
 namespace DbEasy\Placeholder;
 
 
-class Float implements PlaceholderInterface
+class Float extends PlaceholderAbstract
 {
+    /**
+     * constructor is required for initialization placeholder name
+     */
+    public function __construct()
+    {
+        $this->setName('?f');
+    }
 
     /**
      * @param $value
@@ -23,27 +30,10 @@ class Float implements PlaceholderInterface
     /**
      * @param $value
      * @param string $nativePlaceholder
-     * @param string $prefix
      * @return string
      */
-    public function transformPlaceholder($value, $nativePlaceholder = '', $prefix = '')
+    public function transformPlaceholder($value, $nativePlaceholder = '')
     {
         return (empty($nativePlaceholder)) ? $value : $nativePlaceholder;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return "f";
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexp()
-    {
-        return "f";
     }
 }
