@@ -55,7 +55,8 @@ class Prefix extends PlaceholderAbstract implements PlaceholderPrefixInterface
      */
     public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-        //@TODO need escape with other part of table, this is a problem captian
-        return $this->getPrefix();
+        $prefix = $this->getQuotePerformer()->quoteIdentifier($this->getPrefix());
+        $quote = mb_substr($prefix, 0, 1);
+        return trim($prefix, $quote);
     }
 }

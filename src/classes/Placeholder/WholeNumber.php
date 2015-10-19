@@ -35,6 +35,10 @@ class WholeNumber extends PlaceholderAbstract
      */
     public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-        return (empty($nativePlaceholder)) ? $value : $nativePlaceholder;
+        if (!empty($nativePlaceholder)) {
+            return $nativePlaceholder;
+        }
+
+        return $this->getQuotePerformer()->quote($this->transformValue($value));
     }
 }

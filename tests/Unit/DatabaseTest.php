@@ -31,4 +31,41 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $db->setAdapter($myAdapter);
         $this->assertEquals($myAdapter, $db->getAdapter());
     }
+
+    public function testAddCustomPlaceholder_setCustomsPlaceholdersAndDefaultAdapter()
+    {
+        $db = new Database(new DSN('mysql:'));
+        $myPlaceholderOne = Helper::getMockCustomPlaceholder('?x');
+        $db->addCustomPlaceholder($myPlaceholderOne);
+        $myPlaceholderTwo = Helper::getMockCustomPlaceholder('?y');
+        $db->addCustomPlaceholder($myPlaceholderTwo);
+
+        $this->assertInstanceOf('\DbEasy\Adapter\Mysql', $db->getAdapter());
+        $placeholders = $db->getPlaceholders();
+        foreach ($db->getPlaceholders()->getAllPlaceholdersAsArray() as $placeholder) {
+            $this->assertInstanceOf('\DbEasy\Adapter\Mysql', $placeholder->getQuotePerformer());
+        }
+
+        $this->assertEquals('f#_nadxy', $placeholders->getAllPlaceholdersAsString());
+    }
+
+    public function testAddCustomPlaceholder_setCustomsPlaceholdersSetCustomAdapter()
+    {
+        $db = new Database(new DSN('mysql:'));
+        $myPlaceholderOne = Helper::getMockCustomPlaceholder('?x');
+        $db->addCustomPlaceholder($myPlaceholderOne);
+        $myAdapter = Helper::getMockCustomAdapter();
+        $db->setAdapter($myAdapter);
+        $myPlaceholderTwo = Helper::getMockCustomPlaceholder('?y');
+        $db->addCustomPlaceholder($myPlaceholderTwo);
+
+
+        $this->assertEquals($myAdapter, $db->getAdapter());
+        $placeholders = $db->getPlaceholders();
+        foreach ($db->getPlaceholders()->getAllPlaceholdersAsArray() as $placeholder) {
+            $this->assertEquals($myAdapter, $placeholder->getQuotePerformer());
+        }
+
+        $this->assertEquals('f#_nadxy', $placeholders->getAllPlaceholdersAsString());
+    }
 }

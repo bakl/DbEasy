@@ -34,7 +34,6 @@ class Identifier extends PlaceholderAbstract
      */
     public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-        //@TODO escape as identifier
-        return $value;
+        return $this->getQuotePerformer()->quoteIdentifier($value);
     }
 }

@@ -15,13 +15,16 @@ class Sqlite extends AdapterAbstract
     /**
      * @return mixed
      */
-    protected function connect()
+    public function connect()
     {
-        if ($this->dsn->getHost() === 'memory') {
+        if ($this->dsn->getPath() === ':memory:') {
             $this->connection = new \PDO('sqlite::memory:');
         } else {
             $this->connection = new \PDO('sqlite::' . $this->dsn->getPath());
         }
+
+        // TODO: need use DbSimple method for error hooks
+        $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
     /**
@@ -36,13 +39,14 @@ class Sqlite extends AdapterAbstract
             return false;
         }
 
-        if ($stmt->execute($query->getValues())) {
+        if (!$stmt->execute($query->getValues())) {
             return false;
         }
 
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         if($result === false) {
+            print 3;
             return false;
         }
 
@@ -89,11 +93,16 @@ class Sqlite extends AdapterAbstract
     }
 
     /**
+     * TODO: create correct method
      * @param mixed $value
-     * @return mixed
+     * @return string
      */
-    public function escape($value)
+    public function quoteIdentifier($value)
     {
-        // TODO: Implement escape() method.
+        if (empty($this->connection)) {
+            $this->connect();
+        }
+
+        return $this->connection->quote($value);
     }
 }

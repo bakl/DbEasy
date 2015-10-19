@@ -7,7 +7,7 @@
 namespace DbEasy\Tests;
 
 
-class AllUnitTests
+class AllTests
 {
     public static function suite()
     {
@@ -15,6 +15,7 @@ class AllUnitTests
 
         $suite->addTestSuite('\DbEasy\Tests\Unit\QueryTransformerTest');
         $suite->addTestSuite('\DbEasy\Tests\Unit\DatabaseTest');
+        $suite->addTestSuite('DbEasy\Tests\Integration\DatabaseTest');
 
         return $suite;
     }

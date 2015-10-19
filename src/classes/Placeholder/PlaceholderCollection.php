@@ -77,6 +77,14 @@ class PlaceholderCollection
     }
 
     /**
+     * @return PlaceholderAbstract[]
+     */
+    public function getAllPlaceholdersAsArray()
+    {
+        return $this->placeholders;
+    }
+
+    /**
      * @return string
      */
     public function getPrefix()

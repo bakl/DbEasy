@@ -37,7 +37,7 @@ abstract class AdapterAbstract implements QuotePerformerInterface
     /**
      * @return mixed
      */
-    abstract protected function connect();
+    abstract public function connect();
 
     /**
      * @param Query $query
@@ -93,7 +93,6 @@ abstract class AdapterAbstract implements QuotePerformerInterface
         return '?';
     }
 
-
     /**
      * @return array
      */
@@ -105,6 +104,14 @@ abstract class AdapterAbstract implements QuotePerformerInterface
     public function setLastError($code, $message)
     {
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
 }

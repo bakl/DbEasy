@@ -11,13 +11,13 @@ interface QuotePerformerInterface
 {
     /**
      * @param mixed $value
-     * @return mixed
-     */
-    public function escape($value);
-
-    /**
-     * @param $value
      * @return string
      */
     public function quote($value);
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    public function quoteIdentifier($value);
 }

@@ -14,7 +14,7 @@ class Mysql extends AdapterAbstract
     /**
      * @return mixed
      */
-    protected function connect()
+    public function connect()
     {
         $this->connection = new \PDO(
             sprintf(
@@ -74,10 +74,10 @@ class Mysql extends AdapterAbstract
 
     /**
      * @param mixed $value
-     * @return mixed
+     * @return string
      */
-    public function escape($value)
+    public function quoteIdentifier($value)
     {
-        // TODO: Implement escape() method.
+        // TODO: Implement quoteIdentifier() method.
     }
 }

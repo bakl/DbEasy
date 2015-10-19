@@ -92,9 +92,7 @@ class Database
     public function query($sql)
     {
         $query = Query::createByArray(func_get_args());
-
-        $transformer = new QueryTransformer($this->getAdapter(), $this->placeholders);
-        $query = $transformer->transformQuery($query);
+        $query = $this->transformQuery($query);
         $result = $this->getAdapter()->execute($query);
 
         $error = $this->adapter->getLastError();
@@ -108,9 +106,7 @@ class Database
 
     public function select()
     {
-
         $result = call_user_func_array(array($this, 'query'), func_get_args());
-
         return $result;
     }
 
@@ -149,8 +145,7 @@ class Database
     public function getQuery($sql)
     {
         $query = Query::createByArray(func_get_args());
-        $transformer = new QueryTransformer($this->adapter, $this->placeholders);
-        return $transformer->transformQuery($query, true);
+        return $this->transformQuery($query, true);
     }
 
     /**
@@ -215,5 +210,22 @@ class Database
         $this->errorHandler = $handler;
     }
 
+    /**
+     * @param $query
+     * @param bool $isForceExpandValues
+     * @return Query
+     */
+    private function transformQuery(Query $query, $isForceExpandValues = false)
+    {
+        $transformer = new QueryTransformer($this->getAdapter(), $this->placeholders);
+        return $transformer->transformQuery($query, $isForceExpandValues);
+    }
 
+    /**
+     * @return PlaceholderCollection
+     */
+    public function getPlaceholders()
+    {
+        return $this->placeholders;
+    }
 }
