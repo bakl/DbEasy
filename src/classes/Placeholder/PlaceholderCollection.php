@@ -103,8 +103,6 @@ class PlaceholderCollection
             }
         }
 
-        echo "a";
-
         $this->prefix = $prefix;
     }
 
