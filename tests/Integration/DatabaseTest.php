@@ -14,7 +14,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     /** @var Database $db */
     private $db;
 
-    public function setUp(){
+    public function setUp()
+    {
         $this->db = Database::connect("sqlite::memory:");
         $this->db->getAdapter()->connect();
         /** @var \PDO $pdo */
@@ -66,5 +67,16 @@ SQL;
         $this->assertEquals('SELECT 10.5 + 10 + 0 + 0 + 2 + 10', $sqlAsText);
     }
 
+    public function testSelect_QueryHandleError()
+    {
+        $isHandleError = false;
+        $this->db->setErrorHandler(function ($message, $error) use ($isHandleError) {
+            $this->assertEquals('', $message);
+            $this->assertEquals([], $error);
+        });
+        $this->db->select("SELECT ?f + ?f", 2);
+        $this->db->setErrorHandler(null);
+        $this->assertTrue($isHandleError);
+    }
 
 }

@@ -22,9 +22,6 @@ class Sqlite extends AdapterAbstract
         } else {
             $this->connection = new \PDO('sqlite::' . $this->dsn->getPath());
         }
-
-        // TODO: need use DbSimple method for error hooks
-        $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
     /**
