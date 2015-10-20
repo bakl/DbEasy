@@ -147,6 +147,10 @@ class QueryTransformer
             $this->numberPlaceholder++;
             $placeholder = $this->placeholders->getPlaceholder($matches[0]);
 
+            if (count($this->values) == 0) {
+                return 'ERROR_NO_VALUE';
+            }
+
             $value = array_shift($this->values);
 
             if ($value === Database::SKIP_VALUE) {

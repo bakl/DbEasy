@@ -188,8 +188,8 @@ EXPECTED;
             Query::create('SQL_TEXT ?m, ?m SQL_TEXT', ['in1']),
             false
         );
-        $this->assertEquals('SQL_TEXT ?, ?, ?, ?, SQL_PART_WITHOUT_PARAMS SQL_TEXT', $result->getQueryAsText());
-        $this->assertSame(['', false, true, 0], $result->getValues());
+        $this->assertEquals('SQL_TEXT ?, ERROR_NO_VALUE SQL_TEXT', $result->getQueryAsText());
+        $this->assertSame(['out1'], $result->getValues());
     }
 
 }
