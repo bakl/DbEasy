@@ -158,4 +158,22 @@ EXPECTED;
         $this->assertEquals('SQL_TEXT "out1", FALSE SQL_TEXT', $result->getQueryAsText());
         $this->assertEquals([], $result->getValues());
     }
+
+
+    public function testTransformQuery_CustomAdapterCustomPlaceholderWithCommonNativePlaceholderWithoutExpandValueEmptyValues()
+    {
+        $myAdapter = Helper::getMockCustomAdapter();
+        $placeholders = new PlaceholderCollection();
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
+
+        $transformer = new QueryTransformer($myAdapter, $placeholders);
+
+        $result = $transformer->transformQuery(
+            Query::create('SQL_TEXT ?m, ?m, ?m, ?m, ?m SQL_TEXT', ['', false, true, 0, 'skip_me_please']),
+            false
+        );
+        $this->assertEquals('SQL_TEXT ?, ?, ?, ?, SQL_PART_WITHOUT_PARAMS SQL_TEXT', $result->getQueryAsText());
+        $this->assertSame(['', false, true, 0], $result->getValues());
+    }
+
 }

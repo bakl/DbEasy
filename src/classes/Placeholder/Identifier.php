@@ -8,6 +8,8 @@
 namespace DbEasy\Placeholder;
 
 
+use DbEasy\Database;
+
 class Identifier extends PlaceholderAbstract
 {
     /**
@@ -24,7 +26,7 @@ class Identifier extends PlaceholderAbstract
      */
     public function transformValue($value)
     {
-        return null;
+        return Database::SKIP_VALUE;
     }
 
     /**

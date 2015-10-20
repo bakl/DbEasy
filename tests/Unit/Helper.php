@@ -8,6 +8,7 @@ namespace DbEasy\Tests\Unit;
 
 
 use DbEasy\Adapter\AdapterAbstract;
+use DbEasy\Database;
 use DbEasy\Placeholder\PlaceholderAbstract;
 
 class Helper
@@ -57,12 +58,16 @@ class Helper
                 if ($value === 'in4') return 'out4';
                 if ($value === true) return true;
                 if ($value === false) return false;
+                if ($value === 0) return 0;
+                if ($value === '') return '';
+                if ($value === 'skip_me_please') return Database::SKIP_VALUE;
             }));
 
         $myPlaceholder->expects(\PHPUnit_Framework_TestCase::any())
             ->method('transformPlaceholder')
             ->will(\PHPUnit_Framework_TestCase::returnCallback(function ($value, $nativePlaceholder) {
                 if (!empty($nativePlaceholder)) {
+                    if ($value === 'skip_me_please') return "SQL_PART_WITHOUT_PARAMS";
                     return $nativePlaceholder;
                 }
                 if ($value === 'in1') return '"out1"';
@@ -71,6 +76,8 @@ class Helper
                 if ($value === 'in4') return '"out4"';
                 if ($value === true) return 'TRUE';
                 if ($value === false) return 'FALSE';
+                if ($value === 0) return '0';
+                if ($value === '') return '""';
             }));
 
         return $myPlaceholder;
