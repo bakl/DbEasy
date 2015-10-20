@@ -145,7 +145,7 @@ class Database
     public function getQuery($sql)
     {
         $query = Query::createByArray(func_get_args());
-        return $this->transformQuery($query, true);
+        return $this->transformQuery($query, true)->getQueryAsText();
     }
 
     /**

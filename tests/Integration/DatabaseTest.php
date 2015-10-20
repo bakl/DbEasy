@@ -58,5 +58,13 @@ SQL;
         $this->assertCount(2, $result);
     }
 
+    public function testSelect_QueryWithFloatPlaceholder()
+    {
+        $result = $this->db->selectCell("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
+        $sqlAsText = $this->db->getQuery("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
+        $this->assertEquals(32.5, $result);
+        $this->assertEquals('SELECT 10.5 + 10 + 0 + 0 + 2 + 10', $sqlAsText);
+    }
+
 
 }

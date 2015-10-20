@@ -176,4 +176,20 @@ EXPECTED;
         $this->assertSame(['', false, true, 0], $result->getValues());
     }
 
+    public function testTransformQuery_CustomAdapterCustomPlaceholderWithCommonNativePlaceholderWithoutExpandValueFewValues()
+    {
+        $myAdapter = Helper::getMockCustomAdapter();
+        $placeholders = new PlaceholderCollection();
+        $placeholders->addPlaceholder(Helper::getMockCustomPlaceholder('?m'));
+
+        $transformer = new QueryTransformer($myAdapter, $placeholders);
+
+        $result = $transformer->transformQuery(
+            Query::create('SQL_TEXT ?m, ?m SQL_TEXT', ['in1']),
+            false
+        );
+        $this->assertEquals('SQL_TEXT ?, ?, ?, ?, SQL_PART_WITHOUT_PARAMS SQL_TEXT', $result->getQueryAsText());
+        $this->assertSame(['', false, true, 0], $result->getValues());
+    }
+
 }
