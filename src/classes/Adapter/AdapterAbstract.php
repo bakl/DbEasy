@@ -121,6 +121,10 @@ abstract class AdapterAbstract implements QuotePerformerInterface
      */
     public function getLastError()
     {
+        if (empty($this->errors[count($this->errors) - 1])) {
+            return false;
+        }
+
         return $this->errors[count($this->errors) - 1];
     }
 }
