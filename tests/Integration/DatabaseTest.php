@@ -53,27 +53,48 @@ SQL;
 
     public function testSelect_QueryWithCommonPlaceholder()
     {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
         $result = $this->db->select("SELECT * FROM Album WHERE ArtistId = ?", 2);
         $this->assertEquals($result[0]['Title'], 'Balls to the Wall');
         $this->assertEquals($result[1]['Title'], 'Restless and Wild');
         $this->assertCount(2, $result);
+        $this->db->setErrorHandler(null);
     }
 
     public function testSelect_QueryWithFloatPlaceholder()
     {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
         $result = $this->db->selectCell("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
         $sqlAsText = $this->db->getQuery("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
         $this->assertEquals(32.5, $result);
         $this->assertEquals('SELECT 10.5 + 10 + 0 + 0 + 2 + 10', $sqlAsText);
+        $this->db->setErrorHandler(null);
     }
 
     public function testSelect_QueryHandleError()
     {
         $isHandleError = false;
-        $this->db->setErrorHandler(function ($message, $error) use ($isHandleError) {
-            $this->assertEquals('', $message);
-            $this->assertEquals([], $error);
+        $line = 0;
+        $this->db->setErrorHandler(function ($message, $error) use (&$isHandleError, &$line) {
+            $isHandleError = true;
+            $context = '/Users/dakulov/projects/mine/DbEasy/DbEasy/tests/Integration/DatabaseTest.php line '.$line;
+            $this->assertEquals('no such column: ERROR_NO_VALUE at '.$context, $message);
+            $this->assertEquals(
+                [
+                    'code' => 1,
+                    'message' => 'no such column: ERROR_NO_VALUE',
+                    'query' => 'SELECT 2 + ERROR_NO_VALUE',
+                    'context' => $context
+                ],
+                $error
+            );
         });
+
+        $line = __LINE__ + 1;
         $this->db->select("SELECT ?f + ?f", 2);
         $this->db->setErrorHandler(null);
         $this->assertTrue($isHandleError);
