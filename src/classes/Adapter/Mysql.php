@@ -78,7 +78,8 @@ class Mysql extends AdapterAbstract
      */
     public function quoteIdentifier($value)
     {
-        // TODO: Implement quoteIdentifier() method.
+        ///@TODO may be this wrong way?!
+        return str_replace("'", '`', $this->connection->quote($value));
     }
 
     /**
@@ -86,7 +87,7 @@ class Mysql extends AdapterAbstract
      */
     public function getRowsCountAffectedInLastQuery()
     {
-        // TODO: Implement getRowsCountAffectedInLastQuery() method.
+        return $this->connection->rowCount();
     }
 
     /**
@@ -94,6 +95,6 @@ class Mysql extends AdapterAbstract
      */
     public function getLastInsertId()
     {
-        // TODO: Implement getLastInsertId() method.
+        return $this->connection->lastInsertId();
     }
 }
