@@ -39,6 +39,6 @@ class WholeNumber extends PlaceholderAbstract
             return $nativePlaceholder;
         }
 
-        return $this->getQuotePerformer()->quote($this->transformValue($value));
+        return intval($value);
     }
 }
