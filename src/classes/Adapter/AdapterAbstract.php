@@ -25,9 +25,9 @@ abstract class AdapterAbstract implements QuotePerformerInterface
     protected $connection;
 
     /**
-     * @var Error
+     * @var Error[]
      */
-    protected $error;
+    protected $errors;
 
     /**
      * @return string
@@ -50,6 +50,14 @@ abstract class AdapterAbstract implements QuotePerformerInterface
      */
     final public function __construct()
     {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
     /**
@@ -94,24 +102,29 @@ abstract class AdapterAbstract implements QuotePerformerInterface
     }
 
     /**
-     * @return array
+     * @param string $code
+     * @param string $message
      */
-    public function getLastError()
-    {
-        return $this->error;
-    }
-
-    public function setLastError($code, $message)
-    {
-
+    public function registerNewError($code, $message) {
+        $this->errors[] = new Error($code, $message);
     }
 
     /**
-     * @return mixed
+     * @return Error[]
      */
-    public function getConnection()
-    {
-        return $this->connection;
+    public function getErrors() {
+        return $this->errors;
     }
 
+    /**
+     * @return Error
+     */
+    public function getLastError()
+    {
+        if (empty($this->errors[count($this->errors) - 1])) {
+            return false;
+        }
+
+        return $this->errors[count($this->errors) - 1];
+    }
 }
