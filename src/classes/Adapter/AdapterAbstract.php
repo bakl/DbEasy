@@ -35,9 +35,19 @@ abstract class AdapterAbstract implements QuotePerformerInterface
     abstract public function getRegexpForIgnorePlaceholder();
 
     /**
-     * @return mixed
+     * @return bool
      */
     abstract public function connect();
+
+    /**
+     * @return int
+     */
+    abstract public function getRowsCountAffectedInLastQuery();
+
+    /**
+     * @return int
+     */
+    abstract public function getLastInsertId();
 
     /**
      * @param Query $query

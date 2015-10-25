@@ -12,7 +12,12 @@ use DbEasy\Query;
 class Sqlite extends AdapterAbstract
 {
     /**
-     * @return mixed
+     * @var int
+     */
+    private $rowsCountAffected = 0;
+
+    /**
+     * @return bool
      */
     public function connect()
     {
@@ -65,6 +70,8 @@ class Sqlite extends AdapterAbstract
             return false;
         }
 
+        $this->rowsCountAffected = $stmt->rowCount();
+
         return $result;
     }
 
@@ -95,7 +102,6 @@ class Sqlite extends AdapterAbstract
     }
 
     /**
-     * TODO: create correct method
      * @param mixed $value
      * @return string
      */
@@ -105,6 +111,23 @@ class Sqlite extends AdapterAbstract
             $this->connect();
         }
 
-        return $this->connection->quote($value);
+        $value = $this->connection->quote($value);
+        return '['.substr($value, 1, strlen($value) - 2).']';
+    }
+
+    /**
+     * @return int
+     */
+    public function getRowsCountAffectedInLastQuery()
+    {
+        return $this->rowsCountAffected;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastInsertId()
+    {
+        return $this->connection->lastInsertId();
     }
 }
