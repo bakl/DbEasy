@@ -14,7 +14,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     /** @var Database $db */
     private $db;
 
-    public function setUp(){
+    public function setUp()
+    {
         $this->db = Database::connect("sqlite::memory:");
         $this->db->getAdapter()->connect();
         /** @var \PDO $pdo */
@@ -52,11 +53,137 @@ SQL;
 
     public function testSelect_QueryWithCommonPlaceholder()
     {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+        $this->assertEquals("SELECT * FROM Album WHERE ArtistId = '2'", $this->db->getQuery('SELECT * FROM Album WHERE ArtistId = ?', 2));
         $result = $this->db->select("SELECT * FROM Album WHERE ArtistId = ?", 2);
         $this->assertEquals($result[0]['Title'], 'Balls to the Wall');
         $this->assertEquals($result[1]['Title'], 'Restless and Wild');
         $this->assertCount(2, $result);
     }
 
+    public function testSelect_QueryWithFloatPlaceholder()
+    {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+        $sqlAsText = $this->db->getQuery("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
+        $this->assertEquals('SELECT 10.5 + 10 + 0 + 0 + 2 + 10', $sqlAsText);
+        $result = $this->db->selectCell("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
+        $this->assertEquals(32.5, $result);
+    }
 
+    public function testSelect_QueryHandleError()
+    {
+        $isHandleError = false;
+        $line = 0;
+        $this->db->setErrorHandler(function ($message, $error) use (&$isHandleError, &$line) {
+            $isHandleError = true;
+            $context = '/Users/dakulov/projects/mine/DbEasy/DbEasy/tests/Integration/DatabaseTest.php line ' . $line;
+            $this->assertEquals('no such column: ERROR_NO_VALUE at ' . $context, $message);
+            $this->assertEquals(
+                [
+                    'code' => 1,
+                    'message' => 'no such column: ERROR_NO_VALUE',
+                    'query' => 'SELECT 2 + ERROR_NO_VALUE',
+                    'context' => $context
+                ],
+                $error
+            );
+        });
+
+        $line = __LINE__ + 1;
+        $this->db->select("SELECT ?f + ?f", 2);
+        $this->assertTrue($isHandleError);
+    }
+
+    public function testSelectCol_QueryWithArrayPlaceholder()
+    {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+        $this->assertEquals(
+            "SELECT name FROM Artist WHERE ArtistId IN ('1','2')",
+            $this->db->getQuery('SELECT name FROM Artist WHERE ArtistId IN (?a)', [1, 2])
+        );
+        $result = $this->db->selectCol('SELECT name FROM Artist WHERE ArtistId IN (?a)', [1, 2]);
+        $this->assertEquals(array('AC/DC', 'Accept'), $result);
+    }
+
+    public function testSelectCell_QueryWithIdentifierPlaceholder()
+    {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+        $this->assertEquals(
+            "SELECT name FROM [Artist] WHERE ArtistId = 3",
+            $this->db->getQuery('SELECT name FROM ?# WHERE ArtistId = 3', 'Artist')
+        );
+        $result = $this->db->selectCell('SELECT name FROM ?# WHERE ArtistId = 3', 'Artist');
+        $this->assertEquals('Aerosmith', $result);
+    }
+
+    public function testSelectCell_QueryWithIntPlaceholder()
+    {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+        $this->assertEquals(
+            'SELECT name FROM Artist WHERE ArtistId = 3',
+            $this->db->getQuery('SELECT name FROM Artist WHERE ArtistId = ?d', 3)
+        );
+        $result = $this->db->selectCell('SELECT name FROM Artist WHERE ArtistId = ?d', 3);
+        $this->assertEquals('Aerosmith', $result);
+    }
+
+    public function testSelectCell_QueryAssociativePlaceholder()
+    {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+        $this->assertEquals(
+            "SELECT ArtistId FROM Artist WHERE [name] = 'Aerosmith'",
+            $this->db->getQuery(
+                'SELECT ArtistId FROM Artist WHERE ?a',
+                ['name' => 'Aerosmith']
+            )
+        );
+        $this->assertEquals(3, $this->db->selectCell('SELECT ArtistId FROM Artist WHERE ?a', ['name' => 'Aerosmith']));
+    }
+
+    public function testSelectCell_QueryWithOptionalBlocks()
+    {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+        $this->assertEquals(
+            "SELECT ArtistId FROM Artist WHERE 1 AND ([name] = 'Aerosmith')",
+            $this->db->getQuery(
+                'SELECT ArtistId FROM Artist WHERE 1 AND ({[name] = ?}{ OR [name] = ?})',
+                'Aerosmith',
+                Database::SKIP_VALUE
+            )
+        );
+        $this->assertEquals(
+            3,
+            $this->db->selectCell(
+                'SELECT ArtistId FROM Artist WHERE 1 AND ({[name] = ?}{ OR [name] = ?})',
+                'Aerosmith',
+                Database::SKIP_VALUE
+            )
+        );
+    }
+
+    public function testQuery_InsertQuery(){
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+
+        $id = $this->db->query("INSERT INTO Artist ([name]) VALUES(?)", 'DDT');
+        $this->assertNotEmpty($id);
+
+        $artist = $this->db->selectCell("SELECT name FROM Artist WHERE ArtistId = ?", $id);
+        $this->assertEquals($artist, 'DDT');
+    }
 }

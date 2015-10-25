@@ -25,7 +25,6 @@ class ValuesList extends PlaceholderAbstract
      */
     public function transformValue($value)
     {
-        //@TODO escape
         return array_values($value);
     }
 
@@ -38,16 +37,21 @@ class ValuesList extends PlaceholderAbstract
     {
         $resultValues = array();
         foreach ($value as $valueRowKey => $valueRowData) {
-            //@TODO escape $valueRowData as value
-            //$valueRowData = escape($valueRowData);
+            $valueRowData = $this->getQuotePerformer()->quote($valueRowData);
+
             if(!is_int($valueRowKey)){
-                //@TODO escape $valueRowKey as identifier
-                $resultValues[] = implode("=", array($valueRowKey, (empty($nativePlaceholder)) ? $valueRowData : $nativePlaceholder));
+                $resultValues[] = implode(
+                    ' = ',
+                    [
+                        $this->getQuotePerformer()->quoteIdentifier($valueRowKey),
+                        (empty($nativePlaceholder)) ? $valueRowData : $nativePlaceholder
+                    ]
+                );
             } else {
                 $resultValues[] = (empty($nativePlaceholder)) ? $valueRowData : $nativePlaceholder;
             }
         }
 
-        return implode(",", $resultValues);
+        return implode(',', $resultValues);
     }
 }

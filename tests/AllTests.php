@@ -11,7 +11,7 @@ class AllTests
 {
     public static function suite()
     {
-        $suite = new \PHPUnit_Framework_TestSuite('All unit tests');
+        $suite = new \PHPUnit_Framework_TestSuite('All tests');
 
         $suite->addTestSuite('\DbEasy\Tests\Unit\QueryTransformerTest');
         $suite->addTestSuite('\DbEasy\Tests\Unit\DatabaseTest');

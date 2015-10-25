@@ -8,6 +8,8 @@
 namespace DbEasy\Placeholder;
 
 
+use DbEasy\Database;
+
 class Prefix extends PlaceholderAbstract implements PlaceholderPrefixInterface
 {
     /**
@@ -45,7 +47,7 @@ class Prefix extends PlaceholderAbstract implements PlaceholderPrefixInterface
      */
     public function transformValue($value)
     {
-        return null;
+        return Database::SKIP_VALUE;
     }
 
     /**

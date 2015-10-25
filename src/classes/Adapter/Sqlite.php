@@ -7,24 +7,38 @@
 
 namespace DbEasy\Adapter;
 
-use DbEasy\Adapter\AdapterAbstract;
 use DbEasy\Query;
 
 class Sqlite extends AdapterAbstract
 {
     /**
-     * @return mixed
+     * @var int
+     */
+    private $rowsCountAffected = 0;
+
+    /**
+     * @return bool
      */
     public function connect()
     {
+        if (!extension_loaded('pdo_sqlite')) {
+            $this->registerNewError('-1', 'PDO sqlite extension is not loaded');
+            return false;
+        }
+
         if ($this->dsn->getPath() === ':memory:') {
             $this->connection = new \PDO('sqlite::memory:');
         } else {
-            $this->connection = new \PDO('sqlite::' . $this->dsn->getPath());
+            $this->connection = new \PDO('sqlite:' . $this->dsn->getPath());
         }
 
-        // TODO: need use DbSimple method for error hooks
-        $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $errorInfo = $this->connection->errorInfo();
+        if (!is_null($this->connection->errorCode())) {
+            $this->registerNewError($errorInfo[1], $errorInfo[2]);
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -33,38 +47,33 @@ class Sqlite extends AdapterAbstract
      */
     protected function executeQuery(Query $query)
     {
+        /** @var \PDOStatement $stmt */
         $stmt = $this->connection->prepare($query->getQueryAsText());
 
-        if (!$stmt instanceof \PDOStatement) {
+        if ($stmt === false) {
+            $errorInfo = $this->connection->errorInfo();
+            $this->registerNewError($errorInfo[1], $errorInfo[2]);
             return false;
         }
 
         if (!$stmt->execute($query->getValues())) {
+            $errorInfo = $stmt->errorInfo();
+            $this->registerNewError($errorInfo[1], $errorInfo[2]);
             return false;
         }
 
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         if($result === false) {
-            print 3;
+            $errorInfo = $stmt->errorInfo();
+            $this->registerNewError($errorInfo[1], $errorInfo[2]);
             return false;
         }
 
+        $this->rowsCountAffected = $stmt->rowCount();
+
         return $result;
-
     }
-
-//    /**
-//     * @return void
-//     */
-//    protected function setLastError()
-//    {
-//        $errorInfo = $this->connection->errorInfo();
-//        if (!empty($errorInfo[1])) {
-//            $this->error[self::ERROR_CODE] = $errorInfo[0];
-//            $this->error[self::ERROR_MESSAGE] = $errorInfo[2];
-//        }
-//    }
 
     /**
      * @return string
@@ -93,7 +102,6 @@ class Sqlite extends AdapterAbstract
     }
 
     /**
-     * TODO: create correct method
      * @param mixed $value
      * @return string
      */
@@ -103,6 +111,23 @@ class Sqlite extends AdapterAbstract
             $this->connect();
         }
 
-        return $this->connection->quote($value);
+        $value = $this->connection->quote($value);
+        return '['.substr($value, 1, strlen($value) - 2).']';
+    }
+
+    /**
+     * @return int
+     */
+    public function getRowsCountAffectedInLastQuery()
+    {
+        return $this->rowsCountAffected;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastInsertId()
+    {
+        return $this->connection->lastInsertId();
     }
 }

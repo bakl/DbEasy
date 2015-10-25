@@ -80,4 +80,20 @@ class Mysql extends AdapterAbstract
     {
         // TODO: Implement quoteIdentifier() method.
     }
+
+    /**
+     * @return int
+     */
+    public function getRowsCountAffectedInLastQuery()
+    {
+        // TODO: Implement getRowsCountAffectedInLastQuery() method.
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastInsertId()
+    {
+        // TODO: Implement getLastInsertId() method.
+    }
 }

@@ -91,13 +91,24 @@ class Database
      */
     public function query($sql)
     {
-        $query = Query::createByArray(func_get_args());
-        $query = $this->transformQuery($query);
+        $sourceQuery = Query::createByArray(func_get_args());
+        $query = $this->transformQuery($sourceQuery);
         $result = $this->getAdapter()->execute($query);
 
-        $error = $this->adapter->getLastError();
-        if (!empty($error)) {
-            call_user_func_array($this->errorHandler, ["message", $error]);
+        if (!empty($this->errorHandler)) {
+            $error = $this->getPreparedErrorMessage($sourceQuery);
+            if (!empty($error)) {
+                call_user_func_array($this->errorHandler, $error);
+                return false;
+            }
+        }
+
+        if(preg_match('/^\s*INSERT \s+/six', $query->getQueryAsText())){
+            return $this->adapter->getLastInsertId();
+        }
+
+        if(preg_match('/^\s*DELETE|UPDATE \s+/six', $query->getQueryAsText())){
+            return $this->adapter->getRowsCountAffectedInLastQuery();
         }
 
         return $result;
@@ -145,7 +156,7 @@ class Database
     public function getQuery($sql)
     {
         $query = Query::createByArray(func_get_args());
-        return $this->transformQuery($query, true);
+        return $this->transformQuery($query, true)->getQueryAsText();
     }
 
     /**
@@ -219,6 +230,48 @@ class Database
     {
         $transformer = new QueryTransformer($this->getAdapter(), $this->placeholders);
         return $transformer->transformQuery($query, $isForceExpandValues);
+    }
+
+
+    /**
+     * @param Query $query
+     * @return array
+     */
+    private function getPreparedErrorMessage(Query $query)
+    {
+        $error = $this->adapter->getLastError();
+
+        if ($error == false) {
+            return false;
+        }
+
+        $trace = debug_backtrace();
+
+        $entryPoint = [];
+        $entryPoint['file'] = '';
+        $entryPoint['line'] = '';
+        foreach ($trace as $item) {
+            if (empty($item['file'])) {
+                continue;
+            }
+
+            if (preg_match('~^'.__DIR__.'~', $item['file'])) {
+                continue;
+            }
+
+            $entryPoint = $item;
+            break;
+        }
+
+        return [
+            'message' => sprintf('%s at %s line %s', $error->getMessage(), $entryPoint['file'], $entryPoint['line']),
+            'info' => [
+                'code' => $error->getCode(),
+                'message' => $error->getMessage(),
+                'query' => $this->transformQuery($query, true)->getQueryAsText(),
+                'context' => sprintf('%s line %s', $entryPoint['file'], $entryPoint['line'])
+            ]
+        ];
     }
 
     /**
