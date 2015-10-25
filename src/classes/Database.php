@@ -103,6 +103,14 @@ class Database
             }
         }
 
+        if(preg_match('/^\s*INSERT \s+/six', $query->getQueryAsText())){
+            return $this->adapter->getLastInsertId();
+        }
+
+        if(preg_match('/^\s*DELETE|UPDATE \s+/six', $query->getQueryAsText())){
+            return $this->adapter->getRowsCountAffectedInLastQuery();
+        }
+
         return $result;
     }
 
