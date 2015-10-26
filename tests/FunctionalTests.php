@@ -11,7 +11,7 @@ class FunctionalTests
 {
     public static function suite()
     {
-        $suite = new \PHPUnit_Framework_TestSuite('All integration tests');
+        $suite = new \PHPUnit_Framework_TestSuite('All functional tests');
 
         $suite->addTestSuite('DbEasy\Tests\Functional\DatabaseTest');
 
