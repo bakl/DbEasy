@@ -15,7 +15,7 @@
   "autoload": {
     "psr-4": {
       "DbEasy\\Tests\\Unit\\": "tests/Unit",
-      "DbEasy\\Tests\\Integration\\": "tests/Integration",
+      "DbEasy\\Tests\\Functional\\": "tests/Functional",
       "DbEasy\\Tests\\": "tests/",
       "DbEasy\\": "src/classes/"
     }

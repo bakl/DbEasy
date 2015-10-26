@@ -4,7 +4,7 @@
  * @since: 19.10.15
  */
 
-namespace DbEasy\Tests\Integration;
+namespace DbEasy\Tests\Functional;
 
 
 use DbEasy\Database;
@@ -80,7 +80,7 @@ SQL;
         $line = 0;
         $this->db->setErrorHandler(function ($message, $error) use (&$isHandleError, &$line) {
             $isHandleError = true;
-            $context = '/Users/dakulov/projects/mine/DbEasy/DbEasy/tests/Integration/DatabaseTest.php line ' . $line;
+            $context = __DIR__.'/DatabaseTest.php line ' . $line;
             $this->assertEquals('no such column: ERROR_NO_VALUE at ' . $context, $message);
             $this->assertEquals(
                 [
