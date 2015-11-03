@@ -9,11 +9,11 @@
 |Основные placeholder-ы (?, ?a)|query, getQuery|ДА|НЕТ|ДА|пропуск|
 |Дополнительные placeholder-ы(?_, ?#, ?d, ?f, ?n)|query, getQuery|Частично|НЕТ|Частично|свободно|
 |«Родные» placeholder-ы базы (?)|query, getQuery|Частично|НЕТ|Частично|свободно|
-|Выполнение запросов к БД |query, select, selectRow, selectCol, selectPage|Частично|НЕТ|Частично|свободно|
+|Выполнение запросов к БД |query, select, selectRow, selectCol, selectPage|Частично|НЕТ|Частично|bakl|
 |Макроподстановки в SQL-запросах |query, getQuery|ДА|НЕТ|ДА|пропуск|
 |Оптимизация prepare+execute |query|НЕТ|НЕТ|НЕТ|свободно|
 |Логирование запросов |setLogger|НЕТ|НЕТ|НЕТ|свободно|
-|Транзакции |transaction commit rollback|НЕТ|НЕТ|НЕТ|свободно|
+|Транзакции |transaction commit rollback|НЕТ|НЕТ|НЕТ|bakl|
 |Запросы с атрибутами (BLOB_OBJ) |query|НЕТ|НЕТ|НЕТ|свободно|
 |Запросы с атрибутами (CACHE) |query|НЕТ|НЕТ|НЕТ|свободно|
 |Адаптер Mysql | |Частично|НЕТ|НЕТ|свободно|
