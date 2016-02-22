@@ -17,6 +17,24 @@ class Sqlite extends AdapterAbstract
     private $rowsCountAffected = 0;
 
     /**
+     * @var \PDOStatement[]
+     */
+    private $cache = [];
+
+    /**
+     * @param string $sqlAsString
+     * @return \PDOStatement
+     */
+    public function getPrepareStatement($sqlAsString)
+    {
+        if (!isset($this->cache[$sqlAsString])) {
+            $this->cache[$sqlAsString] =  $this->connection->prepare($sqlAsString);
+        }
+
+        return $this->cache[$sqlAsString];
+    }
+
+    /**
      * @return bool
      */
     public function connect()
@@ -47,8 +65,7 @@ class Sqlite extends AdapterAbstract
      */
     protected function executeQuery(Query $query)
     {
-        /** @var \PDOStatement $stmt */
-        $stmt = $this->connection->prepare($query->getQueryAsText());
+        $stmt = $this->getPrepareStatement($query->getQueryAsText());
 
         if ($stmt === false) {
             $errorInfo = $this->connection->errorInfo();
@@ -63,8 +80,7 @@ class Sqlite extends AdapterAbstract
         }
 
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        if($result === false) {
+        if ($result === false) {
             $errorInfo = $stmt->errorInfo();
             $this->registerNewError($errorInfo[1], $errorInfo[2]);
             return false;
@@ -113,7 +129,7 @@ class Sqlite extends AdapterAbstract
         }
 
         $value = $this->connection->quote($value);
-        return '['.substr($value, 1, strlen($value) - 2).']';
+        return '[' . substr($value, 1, strlen($value) - 2) . ']';
     }
 
     /**
