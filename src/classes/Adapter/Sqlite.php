@@ -81,6 +81,7 @@ class Sqlite extends AdapterAbstract
     public function getRegexpForIgnorePlaceholder()
     {
         return '
+            \[  .*?                          \]   |
             "   (?> [^"\\\\]+|\\\\"|\\\\)*    "   |
             \'  (?> [^\'\\\\]+|\\\\\'|\\\\)* \'   |
             `   (?> [^`]+ | ``)*              `   |   # backticks
