@@ -24,7 +24,13 @@ class Reference extends PlaceholderAbstract
      */
     public function transformValue($value)
     {
-        // TODO: Implement transformValue() method.
+        $value = intval($value);
+
+        if ($value == 0) {
+            return null;
+        }
+
+        return $value;
     }
 
     /**
@@ -34,6 +40,10 @@ class Reference extends PlaceholderAbstract
      */
     public function transformPlaceholder($value, $nativePlaceholder = '')
     {
-        // TODO: Implement transformPlaceholder() method.
+        if (!empty($nativePlaceholder)) {
+            return $nativePlaceholder;
+        }
+
+        return intval($value);
     }
 }
