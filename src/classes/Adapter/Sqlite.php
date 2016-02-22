@@ -25,7 +25,7 @@ class Sqlite extends AdapterAbstract
      * @param string $sqlAsString
      * @return \PDOStatement
      */
-    public function getPrepareStatement($sqlAsString)
+    public function getPreparedStatement($sqlAsString)
     {
         if (!isset($this->cache[$sqlAsString])) {
             $this->cache[$sqlAsString] =  $this->connection->prepare($sqlAsString);
@@ -65,7 +65,7 @@ class Sqlite extends AdapterAbstract
      */
     protected function executeQuery(Query $query)
     {
-        $stmt = $this->getPrepareStatement($query->getQueryAsText());
+        $stmt = $this->getPreparedStatement($query->getQueryAsText());
 
         if ($stmt === false) {
             $errorInfo = $this->connection->errorInfo();
