@@ -46,9 +46,19 @@ INSERT INTO [Album] ([Title], [ArtistId]) VALUES ('Balls to the Wall', 2);
 INSERT INTO [Album] ([Title], [ArtistId]) VALUES ('Restless and Wild', 2);
 INSERT INTO [Album] ([Title], [ArtistId]) VALUES ('Let There Be Rock', 1);
 INSERT INTO [Album] ([Title], [ArtistId]) VALUES ('Big Ones', 3);
+
+CREATE TABLE [x?[x]
+(
+    [id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    [value] NVARCHAR(120)
+);
+
+INSERT INTO [x?[x] ([value], [id]) VALUES ('SomeValue', 3);
 SQL;
 
-        $pdo->exec($sql);
+        if ($pdo->exec($sql) === false) {
+            $this->fail(var_export($pdo->errorInfo()));
+        }
     }
 
     public function testSelect_QueryWithCommonPlaceholder()
@@ -56,7 +66,8 @@ SQL;
         $this->db->setErrorHandler(function () {
             $this->fail();
         });
-        $this->assertEquals("SELECT * FROM Album WHERE ArtistId = '2'", $this->db->getQuery('SELECT * FROM Album WHERE ArtistId = ?', 2));
+        $this->assertEquals("SELECT * FROM Album WHERE ArtistId = '2'",
+            $this->db->getQuery('SELECT * FROM Album WHERE ArtistId = ?', 2));
         $result = $this->db->select("SELECT * FROM Album WHERE ArtistId = ?", 2);
         $this->assertEquals($result[0]['Title'], 'Balls to the Wall');
         $this->assertEquals($result[1]['Title'], 'Restless and Wild');
@@ -68,9 +79,11 @@ SQL;
         $this->db->setErrorHandler(function () {
             $this->fail();
         });
-        $sqlAsText = $this->db->getQuery("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
+        $sqlAsText = $this->db->getQuery("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, null, 'string', '2string',
+            '10');
         $this->assertEquals('SELECT 10.5 + 10 + 0 + 0 + 2 + 10', $sqlAsText);
-        $result = $this->db->selectCell("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, NULL, 'string', '2string', '10');
+        $result = $this->db->selectCell("SELECT ?f + ?f + ?f + ?f + ?f + ?f", 10.5, 10, null, 'string', '2string',
+            '10');
         $this->assertEquals(32.5, $result);
     }
 
@@ -80,7 +93,7 @@ SQL;
         $line = 0;
         $this->db->setErrorHandler(function ($message, $error) use (&$isHandleError, &$line) {
             $isHandleError = true;
-            $context = __DIR__.'/DatabaseTest.php line ' . $line;
+            $context = __DIR__ . '/DatabaseTest.php line ' . $line;
             $this->assertEquals('no such column: ERROR_NO_VALUE at ' . $context, $message);
             $this->assertEquals(
                 [
@@ -175,7 +188,8 @@ SQL;
         );
     }
 
-    public function testQuery_InsertQuery(){
+    public function testQuery_InsertQuery()
+    {
         $this->db->setErrorHandler(function () {
             $this->fail();
         });
@@ -185,5 +199,15 @@ SQL;
 
         $artist = $this->db->selectCell("SELECT name FROM Artist WHERE ArtistId = ?", $id);
         $this->assertEquals($artist, 'DDT');
+    }
+
+    public function testQuery_SqliteSquareBracketsIgnorePlaceholder()
+    {
+        $this->db->setErrorHandler(function () {
+            $this->fail();
+        });
+
+        $result = $this->db->query("SELECT [value] FROM [x?[x] WHERE [id] = ?", 3);
+        $this->assertEquals('SomeValue', $result[0]['value']);
     }
 }
